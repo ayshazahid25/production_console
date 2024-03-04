@@ -4,23 +4,10 @@ export const initial = () => ({
   type: types.INITIAL,
 });
 
-export const initializeSession = (token) => ({
-  type: types.INITIALIZE_SESSION,
+export const initializeSessionAndSocket = (token) => ({
+  type: types.INITIALIZE_SESSION_AND_SOCKET,
   payload: {
     token,
-  },
-});
-
-export const registerUserRequest = (user) => ({
-  type: types.REGISTER_USER_REQUEST,
-  payload: {
-    ...user,
-  },
-});
-export const registerUserSuccess = ({ message }) => ({
-  type: types.REGISTER_USER_SUCCESS,
-  payload: {
-    message,
   },
 });
 
@@ -48,6 +35,39 @@ export const getUserSuccess = ({ items, accessToken }) => ({
     accessToken,
   },
 });
+
+export const updateUserProfileRequest = (userId, userData) => ({
+  type: types.UPDATE_USER_PROFILE_REQUEST,
+  payload: {
+    userId,
+    user: {
+      title: userData.title,
+      gender: userData.gender,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      email: userData.email,
+      phone_number: userData.phone_number,
+      CNIC: userData.CNIC,
+      address: userData.address,
+    },
+    avatarUrl: userData.avatarUrl,
+  },
+});
+
+export const updateUserProfileSuccess = ({ message }) => ({
+  type: types.UPDATE_USER_PROFILE_SUCCESS,
+  payload: {
+    message,
+  },
+});
+
+//   // LOGOUT
+//   const logout = useCallback(() => {
+//     setSession(null);
+//     dispatch({
+//       type: 'LOGOUT',
+//     });
+//   }, []);
 
 export const logoutRequest = () => ({ type: types.LOGOUT_REQUEST });
 

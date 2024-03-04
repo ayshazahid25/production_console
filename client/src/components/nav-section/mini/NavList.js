@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+
 import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 // hooks
@@ -9,13 +10,7 @@ import NavItem from './NavItem';
 
 // ----------------------------------------------------------------------
 
-NavList.propTypes = {
-  data: PropTypes.object,
-  depth: PropTypes.number,
-  hasChild: PropTypes.bool,
-};
-
-export default function NavList({ data, depth, hasChild }) {
+function NavList({ user, data, depth, hasChild }) {
   const navRef = useRef(null);
 
   const { pathname } = useLocation();
@@ -71,7 +66,6 @@ export default function NavList({ data, depth, hasChild }) {
         onMouseEnter={handleOpen}
         onMouseLeave={handleClose}
       />
-
       {hasChild && (
         <StyledPopover
           open={open}
@@ -83,25 +77,36 @@ export default function NavList({ data, depth, hasChild }) {
             onMouseLeave: handleClose,
           }}
         >
-          <NavSubList data={data.children} depth={depth} />
+          <NavSubList user={user} data={data.children} depth={depth} />
         </StyledPopover>
       )}
     </>
   );
 }
 
+NavList.propTypes = {
+  data: PropTypes.object,
+  depth: PropTypes.number,
+  hasChild: PropTypes.bool,
+  user: PropTypes.object,
+};
+
+export default NavList;
+
 // ----------------------------------------------------------------------
 
 NavSubList.propTypes = {
+  user: PropTypes.object,
   data: PropTypes.array,
   depth: PropTypes.number,
 };
 
-function NavSubList({ data, depth }) {
+function NavSubList({ user, data, depth }) {
   return (
     <>
       {data.map((list) => (
         <NavList
+          user={user}
           key={list.title + list.path}
           data={list}
           depth={depth + 1}

@@ -107,7 +107,6 @@ function* watchCreateCarRequest() {
 
 function* updateCar({ payload }) {
   try {
-    console.log(payload);
     const result = yield call(api.updateCar, payload);
 
     yield put(

@@ -2,31 +2,23 @@ import PropTypes from 'prop-types';
 // @mui
 import { useTheme } from '@mui/material/styles';
 import { Stack, AppBar, Toolbar, IconButton } from '@mui/material';
-// utils
-import { bgBlur } from '../../../utils/cssStyles';
+// Action
+// config
+import { HEADER, NAV } from '../../../config-global';
 // hooks
 import useOffSetTop from '../../../hooks/useOffSetTop';
 import useResponsive from '../../../hooks/useResponsive';
-// config
-import { HEADER, NAV } from '../../../config-global';
-// components
-import Logo from '../../../components/logo';
+// utils
+import { bgBlur } from '../../../utils/cssStyles';
+// componentss
+// import Logo from '../../../components/logo';
 import Iconify from '../../../components/iconify';
 import { useSettingsContext } from '../../../components/settings';
-//
-import Searchbar from './Searchbar';
 import AccountPopover from './AccountPopover';
-import LanguagePopover from './LanguagePopover';
-import ContactsPopover from './ContactsPopover';
-import NotificationsPopover from './NotificationsPopover';
 
 // ----------------------------------------------------------------------
 
-Header.propTypes = {
-  onOpenNav: PropTypes.func,
-};
-
-export default function Header({ onOpenNav }) {
+const Header = ({ onOpenNav }) => {
   const theme = useTheme();
 
   const { themeLayout } = useSettingsContext();
@@ -41,15 +33,13 @@ export default function Header({ onOpenNav }) {
 
   const renderContent = (
     <>
-      {isDesktop && isNavHorizontal && <Logo sx={{ mr: 2.5 }} />}
+      {/* {isDesktop && isNavHorizontal && <Logo sx={{ mr: 2.5 }} />} */}
 
       {!isDesktop && (
         <IconButton onClick={onOpenNav} sx={{ mr: 1, color: 'text.primary' }}>
           <Iconify icon="eva:menu-2-fill" />
         </IconButton>
       )}
-
-      <Searchbar />
 
       <Stack
         flexGrow={1}
@@ -58,12 +48,6 @@ export default function Header({ onOpenNav }) {
         justifyContent="flex-end"
         spacing={{ xs: 0.5, sm: 1.5 }}
       >
-        <LanguagePopover />
-
-        <NotificationsPopover />
-
-        <ContactsPopover />
-
         <AccountPopover />
       </Stack>
     </>
@@ -109,4 +93,10 @@ export default function Header({ onOpenNav }) {
       </Toolbar>
     </AppBar>
   );
-}
+};
+
+Header.propTypes = {
+  onOpenNav: PropTypes.func,
+};
+
+export default Header;

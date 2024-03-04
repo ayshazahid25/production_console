@@ -1,3 +1,4 @@
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { memo } from 'react';
 // @mui
@@ -9,12 +10,7 @@ import NavList from './NavList';
 
 // ----------------------------------------------------------------------
 
-NavSectionHorizontal.propTypes = {
-  sx: PropTypes.object,
-  data: PropTypes.array,
-};
-
-function NavSectionHorizontal({ data, sx, ...other }) {
+function NavSectionHorizontal({ Auth: { user }, data, sx, ...other }) {
   return (
     <Stack
       direction="row"
@@ -27,25 +23,42 @@ function NavSectionHorizontal({ data, sx, ...other }) {
       {...other}
     >
       {data.map((group) => (
-        <Items key={group.subheader} items={group.items} />
+        <Items user={user} key={group.subheader} items={group.items} />
       ))}
     </Stack>
   );
 }
 
-export default memo(NavSectionHorizontal);
+NavSectionHorizontal.propTypes = {
+  Auth: PropTypes.object.isRequired,
+  sx: PropTypes.object,
+  data: PropTypes.array,
+};
+
+const mapStateToProps = (state) => ({
+  Auth: state.Auth,
+});
+
+export default connect(mapStateToProps, {})(memo(NavSectionHorizontal));
 
 // ----------------------------------------------------------------------
 
 Items.propTypes = {
   items: PropTypes.array,
+  user: PropTypes.object,
 };
 
-function Items({ items }) {
+function Items({ user, items }) {
   return (
     <>
       {items.map((list) => (
-        <NavList key={list.title + list.path} data={list} depth={1} hasChild={!!list.children} />
+        <NavList
+          user={user}
+          key={list.title + list.path}
+          data={list}
+          depth={1}
+          hasChild={!!list.children}
+        />
       ))}
     </>
   );

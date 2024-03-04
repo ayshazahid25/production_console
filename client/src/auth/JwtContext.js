@@ -5,20 +5,17 @@ import { useEffect, useCallback } from 'react';
 import localStorageAvailable from '../utils/localStorageAvailable';
 import { isValidToken } from './utils';
 // action
-import { getUserRequest, initial } from '../actions/auth';
+import { getUserRequest, initial, initializeSessionAndSocket } from '../actions/auth';
 
-function AuthProvider({ children, getUser, init }) {
+function AuthProvider({ children, getUser, init, initSessionAndSocket }) {
   const storageAvailable = localStorageAvailable();
 
   const initialize = useCallback(async () => {
-    console.log('in hereeeeeeeee in jwt contesxt', localStorage.getItem('x-auth-token'));
     const accessToken = storageAvailable ? localStorage.getItem('x-auth-token') : '';
 
-    console.log('token ya rah::', accessToken);
     if (accessToken && isValidToken(accessToken)) {
-      // initSessionAndSocket(accessToken);
+      initSessionAndSocket(accessToken);
 
-      console.log('calll the apiiiii ');
       getUser(accessToken);
     } else {
       init();
@@ -47,4 +44,5 @@ const mapStateToProps = null;
 export default connect(mapStateToProps, {
   init: initial,
   getUser: getUserRequest,
+  initSessionAndSocket: initializeSessionAndSocket,
 })(AuthProvider);

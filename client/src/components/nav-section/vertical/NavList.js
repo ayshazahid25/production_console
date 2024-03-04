@@ -1,4 +1,5 @@
 import PropTypes from 'prop-types';
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 // @mui
@@ -10,13 +11,7 @@ import NavItem from './NavItem';
 
 // ----------------------------------------------------------------------
 
-NavList.propTypes = {
-  data: PropTypes.object,
-  depth: PropTypes.number,
-  hasChild: PropTypes.bool,
-};
-
-export default function NavList({ data, depth, hasChild }) {
+function NavList({ user, data, depth, hasChild }) {
   const { pathname } = useLocation();
 
   const { active, isExternalLink } = useActiveLink(data.path);
@@ -51,25 +46,30 @@ export default function NavList({ data, depth, hasChild }) {
 
       {hasChild && (
         <Collapse in={open} unmountOnExit>
-          <NavSubList data={data.children} depth={depth} />
+          <NavSubList user={user} data={data.children} depth={depth} />
         </Collapse>
       )}
     </>
   );
 }
 
-// ----------------------------------------------------------------------
-
-NavSubList.propTypes = {
-  data: PropTypes.array,
+NavList.propTypes = {
+  user: PropTypes.object,
+  data: PropTypes.object,
   depth: PropTypes.number,
+  hasChild: PropTypes.bool,
 };
 
-function NavSubList({ data, depth }) {
+export default NavList;
+
+// ----------------------------------------------------------------------
+
+function NavSubList({ user, data, depth }) {
   return (
     <>
       {data.map((list) => (
         <NavList
+          user={user}
           key={list.title + list.path}
           data={list}
           depth={depth + 1}
@@ -79,3 +79,9 @@ function NavSubList({ data, depth }) {
     </>
   );
 }
+
+NavSubList.propTypes = {
+  user: PropTypes.object,
+  data: PropTypes.array,
+  depth: PropTypes.number,
+};

@@ -10,38 +10,46 @@ const icon = (name) => (
 );
 
 const ICONS = {
+  other: icon('ic_folder'),
   user: icon('ic_user'),
   ecommerce: icon('ic_ecommerce'),
   analytics: icon('ic_analytics'),
   dashboard: icon('ic_dashboard'),
+  category: icon('ic_label'),
+  vendor: icon('ic_cart'),
+  chat: icon('ic_chat'),
+  banking: icon('ic_banking'),
+  invoice: icon('ic_invoice'),
 };
 
 const navConfig = [
   // GENERAL
   // ----------------------------------------------------------------------
   {
-    subheader: 'general v4.1.0',
+    subheader: 'general',
     items: [
-      { title: 'Home', path: PATH_DASHBOARD.home, icon: ICONS.dashboard },
-      { title: 'Two', path: PATH_DASHBOARD.two, icon: ICONS.ecommerce },
-      { title: 'Three', path: PATH_DASHBOARD.three, icon: ICONS.analytics },
+      {
+        title: 'Home',
+        path: PATH_DASHBOARD.home,
+        icon: ICONS.dashboard,
+      },
     ],
   },
-
   // MANAGEMENT
   // ----------------------------------------------------------------------
   {
     subheader: 'management',
     items: [
       {
-        title: 'user',
-        path: PATH_DASHBOARD.user.root,
+        title: 'category',
+        path: PATH_DASHBOARD.category,
+        icon: ICONS.category,
+        role: 'is_admin',
+      },
+      {
+        title: 'car',
+        path: PATH_DASHBOARD.car,
         icon: ICONS.user,
-        children: [
-          { title: 'Four', path: PATH_DASHBOARD.user.four },
-          { title: 'Five', path: PATH_DASHBOARD.user.five },
-          { title: 'Six', path: PATH_DASHBOARD.user.six },
-        ],
       },
     ],
   },

@@ -3,17 +3,12 @@ import { connect } from 'react-redux';
 import PermissionDeniedPage from '../pages/dashboard/PermissionDeniedPage';
 // ----------------------------------------------------------------------
 
-function RoleGuard({ Auth: { user }, children, permission }) {
-  return (user.permission_settings && user.permission_settings[permission]) || user.is_admin ? (
-    <> {children} </>
-  ) : (
-    <PermissionDeniedPage />
-  );
+function RoleGuard({ Auth: { user }, children }) {
+  return user.is_admin ? <> {children} </> : <PermissionDeniedPage />;
 }
 
 RoleGuard.propTypes = {
   children: PropTypes.node,
-  permission: PropTypes.string,
   Auth: PropTypes.object.isRequired,
 };
 

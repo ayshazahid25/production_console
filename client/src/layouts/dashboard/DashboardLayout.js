@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import useResponsive from '../../hooks/useResponsive';
 // components
 import { useSettingsContext } from '../../components/settings';
+
 //
 import Main from './Main';
 import Header from './header';
@@ -15,7 +16,7 @@ import NavHorizontal from './nav/NavHorizontal';
 
 // ----------------------------------------------------------------------
 
-export default function DashboardLayout() {
+function DashboardLayout() {
   const { themeLayout } = useSettingsContext();
 
   const isDesktop = useResponsive('up', 'lg');
@@ -90,3 +91,5 @@ export default function DashboardLayout() {
     </>
   );
 }
+
+export default DashboardLayout;

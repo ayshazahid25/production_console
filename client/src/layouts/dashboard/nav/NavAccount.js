@@ -1,3 +1,6 @@
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { startCase } from 'lodash';
 // @mui
 import { styled, alpha } from '@mui/material/styles';
 import { Box, Typography } from '@mui/material';
@@ -17,24 +20,26 @@ const StyledRoot = styled('div')(({ theme }) => ({
 
 // ----------------------------------------------------------------------
 
-export default function NavAccount() {
-  const user = {
-    displayName: 'ayesha',
-  };
-
+function NavAccount({ Auth: { user } }) {
   return (
     <StyledRoot>
-      <CustomAvatar src={user?.photoURL} alt={user?.displayName} name={user?.displayName} />
+      <CustomAvatar src="" alt={user.first_name} name={user.first_name} />
 
       <Box sx={{ ml: 2, minWidth: 0 }}>
         <Typography variant="subtitle2" noWrap>
-          {user?.displayName}
-        </Typography>
-
-        <Typography variant="body2" noWrap sx={{ color: 'text.secondary' }}>
-          {user?.role}
+          {`${startCase(user?.first_name)} ${startCase(user?.last_name)}`}
         </Typography>
       </Box>
     </StyledRoot>
   );
 }
+
+NavAccount.propTypes = {
+  Auth: PropTypes.object.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  Auth: state.Auth,
+});
+
+export default connect(mapStateToProps, {})(NavAccount);

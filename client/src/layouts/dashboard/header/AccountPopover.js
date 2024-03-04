@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { startCase } from 'lodash';
 // @mui
 import { alpha } from '@mui/material/styles';
 import { Box, Divider, Typography, Stack, MenuItem } from '@mui/material';
@@ -10,7 +11,7 @@ import { logoutRequest } from '../../../actions/auth';
 
 // routes
 // routes
-import { PATH_AUTH, PATH_DASHBOARD } from '../../../routes/paths';
+import { PATH_AUTH } from '../../../routes/paths';
 // auth
 // import { useAuthContext } from '../../../auth/useAuthContext';
 // components
@@ -18,23 +19,6 @@ import { CustomAvatar } from '../../../components/custom-avatar';
 import { useSnackbar } from '../../../components/snackbar';
 import MenuPopover from '../../../components/menu-popover';
 import { IconButtonAnimate } from '../../../components/animate';
-
-// ----------------------------------------------------------------------
-
-const OPTIONS = [
-  {
-    label: 'Home',
-    linkTo: '/',
-  },
-  {
-    label: 'Profile',
-    linkTo: '/users/profile',
-  },
-  // {
-  //   label: 'Settings',
-  //   linkTo: '/',
-  // },
-];
 
 // ----------------------------------------------------------------------
 
@@ -89,17 +73,13 @@ const AccountPopover = memo(({ Auth: { user }, logout }) => {
           }),
         }}
       >
-        <CustomAvatar
-          src={user?.user_has_profile_pic?.file_data}
-          alt={`${user?.first_name} ${user?.last_name}`}
-          name={`${user?.first_name} ${user?.last_name}`}
-        />
+        <CustomAvatar src="" alt={user?.first_name} name={user?.first_name} />
       </IconButtonAnimate>
 
       <MenuPopover open={openPopover} onClose={handleClosePopover} sx={{ width: 200, p: 0 }}>
         <Box sx={{ my: 1.5, px: 2.5 }}>
           <Typography variant="subtitle2" noWrap>
-            {`${user?.first_name} ${user?.last_name}`}
+            {`${startCase(user?.first_name)} ${startCase(user?.last_name)}`}
           </Typography>
 
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
@@ -108,17 +88,6 @@ const AccountPopover = memo(({ Auth: { user }, logout }) => {
         </Box>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
-
-        <Stack sx={{ p: 1 }}>
-          {OPTIONS.map((option) => (
-            <MenuItem key={option.label} onClick={() => handleClickItem(option.linkTo)}>
-              {option.label}
-            </MenuItem>
-          ))}
-          {user && user.is_admin && (
-            <MenuItem onClick={() => handleClickItem(PATH_DASHBOARD.settings)}>Settings</MenuItem>
-          )}
-        </Stack>
 
         <Divider sx={{ borderStyle: 'dashed' }} />
 

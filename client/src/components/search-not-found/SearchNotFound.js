@@ -1,16 +1,12 @@
 import PropTypes from 'prop-types';
+import { memo } from 'react';
 // @mui
 import { Paper, Typography } from '@mui/material';
 
 // ----------------------------------------------------------------------
 
-SearchNotFound.propTypes = {
-  query: PropTypes.string,
-  sx: PropTypes.object,
-};
-
-export default function SearchNotFound({ query, sx, ...other }) {
-  return query ? (
+const SearchNotFound = memo(({ query, sx, ...other }) =>
+  query ? (
     <Paper
       sx={{
         textAlign: 'center',
@@ -32,5 +28,11 @@ export default function SearchNotFound({ query, sx, ...other }) {
     <Typography variant="body2" sx={sx}>
       Please enter keywords
     </Typography>
-  );
-}
+  )
+);
+SearchNotFound.propTypes = {
+  query: PropTypes.string,
+  sx: PropTypes.object,
+};
+
+export default SearchNotFound;

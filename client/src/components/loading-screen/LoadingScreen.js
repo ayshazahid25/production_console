@@ -12,7 +12,7 @@ import { NAV } from '../../config-global';
 // auth
 // import { useAuthContext } from '../../auth/useAuthContext';
 //
-import Logo from '../logo';
+// import Logo from '../logo';
 import ProgressBar from '../progress-bar';
 import { useSettingsContext } from '../settings';
 
@@ -80,7 +80,7 @@ function LoadingScreen({ Auth: { isInitialized } }) {
                 repeat: Infinity,
               }}
             >
-              <Logo disabledLink sx={{ width: 64, height: 64 }} />
+              {/* <Logo disabledLink sx={{ width: 64, height: 64 }} /> */}
             </m.div>
 
             <Box

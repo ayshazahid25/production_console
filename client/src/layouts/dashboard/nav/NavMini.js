@@ -5,7 +5,7 @@ import { NAV } from '../../../config-global';
 // utils
 import { hideScrollbarX } from '../../../utils/cssStyles';
 // components
-import Logo from '../../../components/logo';
+// import Logo from '../../../components/logo';
 import { NavSectionMini } from '../../../components/nav-section';
 //
 import navConfig from './config-navigation';
@@ -31,6 +31,7 @@ export default function NavMini() {
 
       <Stack
         sx={{
+          pt: 2,
           pb: 2,
           height: 1,
           position: 'fixed',
@@ -39,7 +40,7 @@ export default function NavMini() {
           ...hideScrollbarX,
         }}
       >
-        <Logo sx={{ mx: 'auto', my: 2 }} />
+        {/* <Logo sx={{ mx: 'auto', my: 2 }} /> */}
 
         <NavSectionMini data={navConfig} />
       </Stack>

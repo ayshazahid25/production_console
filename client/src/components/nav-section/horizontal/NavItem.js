@@ -23,9 +23,8 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
   const renderContent = (
     <StyledItem ref={ref} open={open} depth={depth} active={active} disabled={disabled} {...other}>
       {icon && <StyledIcon>{icon}</StyledIcon>}
-
       <ListItemText
-        primary={`${translate(title)}`}
+        primary={title}
         primaryTypographyProps={{
           noWrap: true,
           component: 'span',
@@ -40,7 +39,7 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
       )}
 
       {caption && (
-        <Tooltip title={`${translate(caption)}`} arrow>
+        <Tooltip title={caption} arrow>
           <Box component="span" sx={{ ml: 0.5, lineHeight: 0 }}>
             <Iconify icon="eva:info-outline" width={16} />
           </Box>

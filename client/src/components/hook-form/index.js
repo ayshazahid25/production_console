@@ -1,3 +1,4 @@
+export * from './RHFUpload';
 export * from './RHFSelect';
 export * from './RHFCheckbox';
 

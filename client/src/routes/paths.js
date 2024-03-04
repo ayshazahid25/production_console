@@ -14,13 +14,10 @@ export const PATH_AUTH = {
 
 export const PATH_DASHBOARD = {
   root: ROOTS_DASHBOARD,
-  home: path(ROOTS_DASHBOARD, '/home'),
-  two: path(ROOTS_DASHBOARD, '/two'),
-  three: path(ROOTS_DASHBOARD, '/three'),
-  user: {
-    root: path(ROOTS_DASHBOARD, '/user'),
-    four: path(ROOTS_DASHBOARD, '/user/four'),
-    five: path(ROOTS_DASHBOARD, '/user/five'),
-    six: path(ROOTS_DASHBOARD, '/user/six'),
-  },
+
+  home: path(ROOTS_DASHBOARD, 'home'),
+
+  category: path(ROOTS_DASHBOARD, 'category'),
+
+  car: path(ROOTS_DASHBOARD, 'car'),
 };

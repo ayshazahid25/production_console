@@ -2,22 +2,15 @@ import { Navigate, useRoutes } from 'react-router-dom';
 // auth
 import AuthGuard from '../auth/AuthGuard';
 import GuestGuard from '../auth/GuestGuard';
+import RoleGuard from '../auth/RoleGuard';
+
 // layouts
 import CompactLayout from '../layouts/compact';
 import DashboardLayout from '../layouts/dashboard';
 // config
 import { PATH_AFTER_LOGIN } from '../config-global';
 //
-import {
-  Page404,
-  Home,
-  PageTwo,
-  PageSix,
-  PageFour,
-  PageFive,
-  LoginPage,
-  PageThree,
-} from './elements';
+import { Page404, DashboardPage, LoginPage, CategoryListPage, CarListPage } from './elements';
 
 // ----------------------------------------------------------------------
 
@@ -46,17 +39,24 @@ export default function Router() {
       ),
       children: [
         { element: <Navigate to={PATH_AFTER_LOGIN} replace />, index: true },
-        { path: 'home', element: <Home /> },
-        { path: 'two', element: <PageTwo /> },
-        { path: 'three', element: <PageThree /> },
+
         {
-          path: 'user',
-          children: [
-            { element: <Navigate to="/user/four" replace />, index: true },
-            { path: 'four', element: <PageFour /> },
-            { path: 'five', element: <PageFive /> },
-            { path: 'six', element: <PageSix /> },
-          ],
+          path: 'home',
+          element: <DashboardPage />,
+        },
+
+        {
+          path: 'category',
+          element: (
+            <RoleGuard>
+              <CategoryListPage />
+            </RoleGuard>
+          ),
+        },
+
+        {
+          path: 'car',
+          element: <CarListPage />,
         },
       ],
     },

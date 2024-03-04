@@ -28,7 +28,8 @@ export default function auth(state = INITIAL_STATE, action) {
         error: null,
       };
     }
-    case types.REGISTER_USER_SUCCESS: {
+
+    case types.UPDATE_USER_PROFILE_SUCCESS: {
       return {
         ...state,
         message: action.payload.message,

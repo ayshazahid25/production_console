@@ -22,9 +22,9 @@ function RoleBasedGuard({
   // const { user } = useAuthContext();
 
   // const currentRole = 'user';
-  const currentRole = user?.role; // admin;
+  const currentRole = user?.is_admin; // admin;
 
-  if (typeof roles !== 'undefined' && !roles.includes(currentRole)) {
+  if (typeof roles !== 'undefined' && !user?.is_admin) {
     return hasContent ? (
       <Container component={MotionContainer} sx={{ textAlign: 'center' }}>
         <m.div variants={varBounce().in}>
@@ -52,7 +52,7 @@ function RoleBasedGuard({
 RoleBasedGuard.propTypes = {
   children: PropTypes.node,
   hasContent: PropTypes.bool,
-  roles: PropTypes.arrayOf(PropTypes.string),
+  roles: PropTypes.string,
   Auth: PropTypes.object.isRequired,
 };
 

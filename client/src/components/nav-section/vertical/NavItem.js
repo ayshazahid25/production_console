@@ -24,7 +24,7 @@ NavItem.propTypes = {
 export default function NavItem({ item, depth, open, active, isExternalLink, ...other }) {
   const { translate } = useLocales();
 
-  const { title, path, icon, info, children, disabled, caption, roles } = item;
+  const { title, path, icon, info, children, disabled, caption, role } = item;
 
   const subItem = depth !== 1;
 
@@ -39,11 +39,11 @@ export default function NavItem({ item, depth, open, active, isExternalLink, ...
       )}
 
       <ListItemText
-        primary={`${translate(title)}`}
+        primary={title}
         secondary={
           caption && (
-            <Tooltip title={`${translate(caption)}`} placement="top-start">
-              <span>{`${translate(caption)}`}</span>
+            <Tooltip title={caption} placement="top-start">
+              <span>{caption}</span>
             </Tooltip>
           )
         }
@@ -96,5 +96,5 @@ export default function NavItem({ item, depth, open, active, isExternalLink, ...
     );
   };
 
-  return <RoleBasedGuard roles={roles}> {renderItem()} </RoleBasedGuard>;
+  return <RoleBasedGuard roles={role}> {renderItem()} </RoleBasedGuard>;
 }

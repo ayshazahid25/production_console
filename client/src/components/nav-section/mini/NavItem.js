@@ -25,7 +25,7 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
       {icon && <StyledIcon>{icon}</StyledIcon>}
 
       <ListItemText
-        primary={`${translate(title)}`}
+        primary={title}
         primaryTypographyProps={{
           noWrap: true,
           sx: {
@@ -46,7 +46,7 @@ const NavItem = forwardRef(({ item, depth, open, active, isExternalLink, ...othe
       />
 
       {caption && (
-        <Tooltip title={`${translate(caption)}`} arrow placement="right">
+        <Tooltip title={caption} arrow placement="right">
           <Iconify
             icon="eva:info-outline"
             width={16}

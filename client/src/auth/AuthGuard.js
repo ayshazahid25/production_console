@@ -13,7 +13,7 @@ import { getUserRequest } from '../actions/auth';
 
 function AuthGuard({ children, Auth: { isAuthenticated, isInitialized, token }, getUser }) {
   const { pathname } = useLocation();
-  console.log('hyyy hyy');
+
   const [requestedLocation, setRequestedLocation] = useState(null);
 
   useEffect(() => {
