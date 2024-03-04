@@ -89,18 +89,33 @@ const getUserById = async (userId) => {
           contractExpired: {
             $cond: {
               if: {
-                $gte: [
+                $ne: [
                   {
-                    $ifNull: [
-                      { $arrayElemAt: ["$contract_durations.end_date", -1] },
-                      new Date(),
-                    ],
+                    $arrayElemAt: ["$contract_durations.employment_type", -1],
                   },
-                  new Date(),
+                  "permanent",
                 ],
               },
-              then: false,
-              else: true,
+              then: {
+                $cond: {
+                  if: {
+                    $lte: [
+                      new Date(),
+                      {
+                        $ifNull: [
+                          {
+                            $arrayElemAt: ["$contract_durations.end_date", -1],
+                          },
+                          new Date(),
+                        ],
+                      },
+                    ],
+                  },
+                  then: false,
+                  else: true,
+                },
+              },
+              else: false,
             },
           },
         },
