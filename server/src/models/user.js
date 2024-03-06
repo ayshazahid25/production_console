@@ -201,7 +201,7 @@ function validateContractDuration(duration) {
             .required(),
           start_date: Joi.date().when("employment_type", {
             is: Joi.string().valid("permanent").required(),
-            then: Joi.forbidden(),
+            then: Joi.optional().allow(null).allow("").empty(""),
             otherwise: Joi.date().required(),
           }),
           end_date: Joi.date().when("employment_type", {
