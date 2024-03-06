@@ -55,9 +55,50 @@ const convertMsToTime = (milliseconds) => {
   };
 };
 
+// Helper function to parse time string into hours and minutes
+const parseTimeString = (timeString) => {
+  const [hours, minutes] = timeString.split(":").map(Number);
+  return { hours, minutes };
+};
+
+// Helper function to convert string time to Date object
+const convertStringTimeToDateTime = (checkIn) => {
+  let dateTime = new Date();
+  let [hours, minutes] = checkIn.split(":");
+  dateTime.setHours(+hours);
+  dateTime.setMinutes(minutes);
+  return dateTime;
+};
+
+// Helper to return current date's start of day and end of day
+const startAndEndOfDay = (specificDate) => {
+  const date = new Date();
+  const startOfDay = new Date(specificDate ? specificDate : date);
+  startOfDay.setUTCHours(0, 0, 0, 0);
+  const endOfDay = new Date(specificDate ? specificDate : date);
+  endOfDay.setUTCHours(23, 59, 59, 999);
+
+  return { startOfDay, endOfDay };
+};
+
+// Helper to return current date's start of day and end of week
+const startAndEndOfWeek = () => {
+  const date = new Date();
+
+  const startOfLastWeek = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
+  startOfLastWeek.setUTCHours(0, 0, 0, 0);
+
+  const endOfLastWeek = new Date(date);
+  endOfLastWeek.setUTCHours(23, 59, 59, 999);
+  return { startOfLastWeek, endOfLastWeek };
+};
+
 module.exports = {
   expressValidatorError,
   generateToken,
   encryptPassword,
   convertMsToTime,
+  convertStringTimeToDateTime,
+  startAndEndOfDay,
+  startAndEndOfWeek,
 };

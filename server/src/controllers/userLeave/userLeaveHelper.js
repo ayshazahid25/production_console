@@ -1,3 +1,4 @@
+const { startAndEndOfDay } = require("../../middleware/commonMiddleware");
 const { UserLeaves } = require("../../models/userLeave");
 const { ObjectId } = require("mongoose").Types;
 
@@ -256,6 +257,26 @@ const updateLeaveStatusMiddleware = async (id, leaveTypeData) => {
     });
 };
 
+//get today's users on leave
+const getTodayUsersOnLeave = async () => {
+  const { startOfDay, endOfDay } = startAndEndOfDay();
+
+  return UserLeaves.countDocuments({
+    status: "approved",
+    starting_date: {
+      $lte: endOfDay,
+    },
+    ending_date: {
+      $gte: startOfDay,
+    },
+  })
+    .then((result) => {
+      return result;
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+};
 module.exports = {
   applyForLeaveMiddleware,
   getAllAppliedLeavesMiddleware,
@@ -263,4 +284,5 @@ module.exports = {
   getLeaveByIdMiddleware,
   findUserLeaveById,
   updateLeaveStatusMiddleware,
+  getTodayUsersOnLeave,
 };

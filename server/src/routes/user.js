@@ -96,9 +96,8 @@ route.post(
           if (start_date > end_date) {
             throw new Error("Start date must be before end date.");
           }
-
-          return true;
         }
+        return true;
       }),
 
     body("start_date")
