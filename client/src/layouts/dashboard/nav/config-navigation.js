@@ -33,6 +33,16 @@ const navConfig = [
         path: PATH_DASHBOARD.home,
         icon: ICONS.dashboard,
       },
+      {
+        title: 'user',
+        path: PATH_DASHBOARD.user.root,
+        icon: ICONS.user,
+        role: 'is_admin',
+        children: [
+          { title: 'list', path: PATH_DASHBOARD.user.list, role: 'is_admin' },
+          { title: 'new', path: PATH_DASHBOARD.user.new, role: 'is_admin' },
+        ],
+      },
     ],
   },
   // MANAGEMENT
@@ -44,6 +54,12 @@ const navConfig = [
         title: 'category',
         path: PATH_DASHBOARD.category,
         icon: ICONS.category,
+        role: 'is_admin',
+      },
+      {
+        title: 'create',
+        path: PATH_DASHBOARD.create,
+        icon: ICONS.user,
         role: 'is_admin',
       },
       {

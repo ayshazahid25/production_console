@@ -25,7 +25,7 @@ export default function BookingCheckInWidgets({ chart, ...other }) {
 
   const isDesktop = useResponsive('up', 'sm');
 
-  const { colors, series, options } = chart;
+  const { colors, series, options, red, pink } = chart;
 
   const chartOptionsCheckIn = useChart({
     chart: {
@@ -62,6 +62,14 @@ export default function BookingCheckInWidgets({ chart, ...other }) {
     ...chartOptionsCheckIn,
     colors,
   };
+  const chartOptionsOnleave = {
+    ...chartOptionsCheckIn,
+    colors: red,
+  };
+  const chartOptionsOnTheway = {
+    ...chartOptionsCheckIn,
+    colors: pink,
+  };
 
   return (
     <Card {...other}>
@@ -87,7 +95,15 @@ export default function BookingCheckInWidgets({ chart, ...other }) {
             <Chart
               type="radialBar"
               series={[item.percent]}
-              options={index === 1 ? chartOptionsCheckOut : chartOptionsCheckIn}
+              options={
+                index === 1
+                  ? chartOptionsCheckOut
+                  : index === 2
+                  ? chartOptionsOnleave
+                  : index === 3
+                  ? chartOptionsOnTheway
+                  : chartOptionsCheckIn
+              }
               {...CHART_SIZE}
             />
 

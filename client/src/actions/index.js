@@ -1,3 +1,8 @@
+// ********** USER **********
+
+export const RESET_PASSWORD_REQUEST = 'RESET_PASSWORD_REQUEST';
+export const DELETE_USER_REQUEST = 'DELETE_USER_REQUEST';
+
 // ********** AUTH **********
 
 export const INITIAL = 'INITIAL';

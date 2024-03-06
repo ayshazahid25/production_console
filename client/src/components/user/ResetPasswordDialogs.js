@@ -21,7 +21,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import FormProvider, { RHFTextField } from '../hook-form';
 import Iconify from '../iconify';
 // action
-import { resetPasswordRequest } from '../../actions/users';
+import { resetPasswordRequest } from '../../actions/user';
 
 // ----------------------------------------------------------------------
 

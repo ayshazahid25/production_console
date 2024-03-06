@@ -23,8 +23,11 @@ import {
   AnalyticsCurrentSubject,
   AnalyticsConversionRates,
 } from '../../sections/@dashboard/general/analytics';
+import { BookingCheckInWidgets } from '../../sections/@dashboard/general/booking';
+// import { BookingCheckInWidgets } from 'src/sections/@dashboard/general/booking';
 
-function DashboardPage({ Auth: { isAuthenticated } }) {
+function DashboardPage({ Auth: { user, isAuthenticated } }) {
+  console.log('user', user);
   const theme = useTheme();
 
   const { themeStretch } = useSettingsContext();
@@ -39,9 +42,63 @@ function DashboardPage({ Auth: { isAuthenticated } }) {
         <Typography variant="h4" sx={{ mb: 5 }}>
           Hi, Welcome back to Production Console
         </Typography>
+        {user.is_admin === true ? (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+              <BookingCheckInWidgets
+                chart={{
+                  colors: [theme.palette.warning.main],
+                  pink: [theme.palette.info.main],
+                  red: [theme.palette.error.main],
 
+                  series: [
+                    { label: 'Check In', percent: 72, total: 38566 },
+                    { label: 'Check Out', percent: 64, total: 18472 },
+                    { label: 'Late', percent: 10, total: 23 },
+                    { label: 'On Leave', percent: 64, total: 18472 },
+                  ],
+                }}
+              />
+            </Grid>
+          </Grid>
+        ) : (
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={12}>
+              <BookingCheckInWidgets
+                chart={{
+                  colors: [theme.palette.warning.main],
+                  red: [theme.palette.error.main],
+
+                  series: [
+                    { label: 'Check In', percent: 72, total: 38566 },
+                    { label: 'Check Out', percent: 64, total: 18472 },
+                    { label: 'On Leaves', percent: 64, total: 18472 },
+                  ],
+                }}
+              />
+            </Grid>
+            <Grid item xs={12} md={12}>
+              <h2>ann</h2>
+            </Grid>
+          </Grid>
+        )}
         <Grid container spacing={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          {/* <Grid item xs={12} md={12}>
+            <BookingCheckInWidgets
+              chart={{
+                colors: [theme.palette.warning.main],
+                red: [theme.palette.error.main],
+
+                series: [
+                  { label: 'Check In', percent: 72, total: 38566 },
+                  { label: 'Check Out', percent: 64, total: 18472 },
+                  { label: 'On Leaves', percent: 64, total: 18472 },
+                ],
+              }}
+            />
+          </Grid> */}
+
+          {/* <Grid item xs={12} sm={6} md={3}>
             <AnalyticsWidgetSummary
               title="Weekly Sales"
               total={714000}
@@ -160,7 +217,7 @@ function DashboardPage({ Auth: { isAuthenticated } }) {
                 ],
               }}
             />
-          </Grid>
+          </Grid> */}
 
           {/* <Grid item xs={12} md={6} lg={8}>
             <AnalyticsNewsUpdate title="News Update" list={_analyticPost} />
