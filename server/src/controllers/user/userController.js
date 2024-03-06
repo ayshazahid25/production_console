@@ -131,7 +131,6 @@ const createUser = asyncHandler(async (req, res) => {
 // @route GET /api/users/
 // @access Private
 const getUser = asyncHandler(async (req, res) => {
-  console.log("sdhasjdkhasdjkahsdjk");
   res.json(req.result);
 });
 

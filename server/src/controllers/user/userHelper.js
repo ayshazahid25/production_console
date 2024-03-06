@@ -286,6 +286,12 @@ const userUpdation = async (id, userData) => {
     });
 };
 
+// Function to count total active employees
+const countActiveEmployees = async () => {
+  const activeEmployees = await Users.countDocuments({ is_active: true });
+  return activeEmployees;
+};
+
 module.exports = {
   findUser,
   addUserMiddleware,
@@ -295,4 +301,5 @@ module.exports = {
   getUserByIdWithDetailMiddleware,
   findUserById,
   userUpdation,
+  countActiveEmployees,
 };
