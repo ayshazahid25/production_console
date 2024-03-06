@@ -8,6 +8,7 @@ const {
   reportOfRemainingWorkingHours,
   reportOfWorkingHoursOfMonth,
   reportOfWorkingHoursOfYear,
+  adminDashboard,
 } = require("../controllers/checkIn/checkInController");
 const route = express.Router();
 
@@ -93,6 +94,9 @@ route.get(
   protect,
   getAllCheckIns
 );
+
+//get admin dashboard
+route.get("/admin-dashboard/", protect, adminDashboard);
 
 //get all checkIns of specific user
 route.get(

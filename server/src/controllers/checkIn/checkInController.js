@@ -15,15 +15,14 @@ const {
   getAllCheckInsByUserIdAndYearMiddleware,
   getTotalWorkingHoursOfDayAndWeek,
   getTotalWorkingHoursYearly,
+  getUserTodaysRecordForAdmin,
 } = require("./checkInHelper");
-const {
-  expressValidatorError,
-  convertMsToTime,
-} = require("../../middleware/commonMiddleware");
+const { expressValidatorError } = require("../../middleware/commonMiddleware");
 const {
   getAppliedWorkingHourRuleMiddleware,
 } = require("../workingHourRules/workingHourRulesHelper");
-const moment = require("moment");
+const { countActiveEmployees } = require("../user/userHelper");
+const { getTodayUsersOnLeave } = require("../userLeave/userLeaveHelper");
 
 // @desc add check-in , check-out time
 // @route POST /api/check_in
@@ -136,7 +135,6 @@ const recordCheckInOut = asyncHandler(async (req, res) => {
 // @route GET /api/check_in/all
 // @access Private
 const getAllCheckIns = asyncHandler(async (req, res) => {
-  console.log("hyyyyyyyyyyyyyyyyyyyasas");
   if (!req.result.is_admin) {
     res.status(400);
     throw new Error("You are not allowed to perform this action");
@@ -218,6 +216,7 @@ const getAllCheckInsByUserId = asyncHandler(async (req, res) => {
     );
   }
 });
+
 // @desc get remaining working hours
 // @route GET /api/check_in/report/:id
 // @access Private
@@ -455,6 +454,97 @@ const reportOfWorkingHoursOfYear = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc admin dashboard
+// @route GET /api/check_in/admin-dashboard/
+// @access Private
+const adminDashboard = asyncHandler(async (req, res) => {
+  if (!req.result.is_admin) {
+    res.status(400);
+    throw new Error("You are not allowed to perform this action");
+  }
+
+  try {
+    // get user today's check-in and check-out record
+    const todayRecords = await getUserTodaysRecordForAdmin();
+
+    if (!todayRecords) {
+      res.status(400);
+      throw new Error("No check-in or check-out entry found for today.");
+    }
+
+    //total number of employees
+    const totalEmployees = await countActiveEmployees();
+
+    const onTimeCheckIns = todayRecords.filter(
+      (record) => record.onTimeCheckIn
+    );
+    const lateCheckIns = todayRecords.filter((record) => record.lateCheckIn);
+
+    // Count users on leave
+    const usersOnLeave = await getTodayUsersOnLeave();
+
+    // Calculate the number of users who have not checked in and are not on leave
+    const notCheckedIn =
+      totalEmployees -
+      onTimeCheckIns.length -
+      lateCheckIns.length -
+      usersOnLeave;
+
+    // Subtract users on leave from total employees
+    const totalEmployeesWithoutLeave = totalEmployees - usersOnLeave;
+
+    // Calculate percentages only based on users who are not on leave
+    const onTimePercentage =
+      totalEmployeesWithoutLeave > 0
+        ? (onTimeCheckIns.length / totalEmployeesWithoutLeave) * 100
+        : 0;
+    const latePercentage =
+      totalEmployeesWithoutLeave > 0
+        ? (lateCheckIns.length / totalEmployeesWithoutLeave) * 100
+        : 0;
+    const notCheckedInPercentage =
+      totalEmployeesWithoutLeave > 0
+        ? ((totalEmployeesWithoutLeave -
+            onTimeCheckIns.length -
+            lateCheckIns.length) /
+            totalEmployeesWithoutLeave) *
+          100
+        : 0;
+    const usersOnLeavePercentage =
+      totalEmployeesWithoutLeave > 0
+        ? (usersOnLeave / totalEmployeesWithoutLeave) * 100
+        : 0;
+
+    res.status(200).json({
+      totalEmployees: totalEmployees,
+      totalEmployeesWithoutLeave: totalEmployeesWithoutLeave,
+      onTimeCheckIns: onTimeCheckIns.length,
+      onTimePercentage,
+      lateCheckIns: lateCheckIns.length,
+      latePercentage,
+      notCheckedIn,
+      notCheckedInPercentage,
+      usersOnLeave,
+      usersOnLeavePercentage,
+    });
+  } catch (error) {
+    res.status(
+      error.statusCode
+        ? error.statusCode
+        : res.statusCode
+        ? res.statusCode
+        : 500
+    );
+    throw new Error(
+      `${
+        error.statusCode !== 400 && res.statusCode !== 400
+          ? "Something went wrong while fetching check-in/check-out data: "
+          : ""
+      }${error.message}`
+    );
+  }
+});
+
 module.exports = {
   recordCheckInOut,
   getAllCheckIns,
@@ -462,4 +552,5 @@ module.exports = {
   reportOfRemainingWorkingHours,
   reportOfWorkingHoursOfMonth,
   reportOfWorkingHoursOfYear,
+  adminDashboard,
 };

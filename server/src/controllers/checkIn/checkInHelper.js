@@ -1,5 +1,12 @@
-const { convertMsToTime } = require("../../middleware/commonMiddleware");
+const {
+  convertMsToTime,
+  startAndEndOfDay,
+  startAndEndOfWeek,
+} = require("../../middleware/commonMiddleware");
 const { CheckIns } = require("../../models/checkIn");
+const {
+  checkInTimeRangeMiddleware,
+} = require("../workingHourRules/workingHourRulesHelper");
 const { ObjectId } = require("mongoose").Types;
 
 //find user's last check in
@@ -41,11 +48,8 @@ const getAllCheckInsMiddleware = async (body) => {
 
   if (body.specificDate) {
     //input in the format "YYYY-MM-DD"
-    const startOfDay = new Date(body.specificDate);
-    startOfDay.setUTCHours(0, 0, 0, 0);
 
-    const endOfDay = new Date(body.specificDate);
-    endOfDay.setUTCHours(23, 59, 59, 999);
+    const { startOfDay, endOfDay } = startAndEndOfDay(body.specificDate);
 
     condition["createdAt"] = {
       $gte: startOfDay,
@@ -305,11 +309,7 @@ const getAllCheckInsByUserIdAndYearMiddleware = async (
 //get today's record
 const getUserTodaysCheckIns = async (userId) => {
   const id = new ObjectId(userId);
-  const date = new Date();
-  const startOfDay = new Date(date);
-  startOfDay.setUTCHours(0, 0, 0, 0);
-  const endOfDay = new Date(date);
-  endOfDay.setUTCHours(23, 59, 59, 999);
+  const { startOfDay, endOfDay } = startAndEndOfDay();
 
   return CheckIns.aggregate([
     {
@@ -345,13 +345,7 @@ const getUserTodaysCheckIns = async (userId) => {
 const getUserWeeklyCheckIns = async (userId) => {
   const id = new ObjectId(userId);
 
-  const date = new Date();
-
-  const startOfLastWeek = new Date(date.getTime() - 7 * 24 * 60 * 60 * 1000);
-  startOfLastWeek.setUTCHours(0, 0, 0, 0);
-
-  const endOfLastWeek = new Date(date);
-  endOfLastWeek.setUTCHours(23, 59, 59, 999);
+  const { startOfLastWeek, endOfLastWeek } = startAndEndOfWeek();
 
   return CheckIns.aggregate([
     {
@@ -529,6 +523,65 @@ const getTotalWorkingHoursYearly = (totalOfficeHoursWeekly, specificYear) => {
   return yearlyWorkingHours;
 };
 
+//get today's checkIns group by users
+const getUserTodaysCheckInsGroupByUsers = async () => {
+  const { startOfDay, endOfDay } = startAndEndOfDay();
+
+  return CheckIns.aggregate([
+    {
+      $match: {
+        check_in_time: {
+          $gte: startOfDay,
+          $lte: endOfDay,
+        },
+      },
+    },
+    {
+      $sort: {
+        check_in_time: 1,
+      },
+    },
+    {
+      $group: {
+        _id: "$user",
+        firstCheckIn: {
+          $first: "$check_in_time",
+        },
+      },
+    },
+  ])
+    .then((result) => {
+      return result;
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+};
+
+//get today's record for admin
+const getUserTodaysRecordForAdmin = async () => {
+  // Extract time range values
+  const checkinTimeRanges = await checkInTimeRangeMiddleware();
+
+  // Get check-ins for the current date
+  const todayCheckIns = await getUserTodaysCheckInsGroupByUsers();
+
+  // Filter check-ins based on the time range of working hour rules
+  const filteredCheckIns = todayCheckIns.map((checkIn) => {
+    const onTimeCheckIn = checkinTimeRanges.some(
+      (range) => checkIn.firstCheckIn <= range.checkin_time_end
+    );
+
+    return {
+      user: checkIn._id,
+      onTimeCheckIn,
+      lateCheckIn: !onTimeCheckIn,
+    };
+  });
+
+  return filteredCheckIns;
+};
+
 module.exports = {
   findUserLastCheckIn,
   recordCheckInMiddleware,
@@ -543,4 +596,5 @@ module.exports = {
   getTotalWorkingHoursOfDayAndWeek,
   getTotalWorkingHoursMonthly,
   getTotalWorkingHoursYearly,
+  getUserTodaysRecordForAdmin,
 };
