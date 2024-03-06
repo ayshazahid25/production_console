@@ -1,3 +1,6 @@
+const {
+  convertStringTimeToDateTime,
+} = require("../../middleware/commonMiddleware");
 const { WorkingHourRules } = require("../../models/workingHourRules");
 const { ObjectId } = require("mongoose").Types;
 
@@ -144,6 +147,19 @@ const findWorkingHourRuleById = async (id) => {
     });
 };
 
+//get checkIn time range
+const checkInTimeRangeMiddleware = async () => {
+  // Get working hour rules for the current date
+  const workingHourRules = await getAppliedWorkingHourRuleMiddleware();
+
+  // Extract time range values
+  const checkinTimeRanges = workingHourRules.map((rule) => ({
+    checkin_time_start: convertStringTimeToDateTime(rule.checkin_time_start),
+    checkin_time_end: convertStringTimeToDateTime(rule.checkin_time_end),
+  }));
+
+  return checkinTimeRanges;
+};
 module.exports = {
   addWorkingHourRulesMiddleware,
   getAllWorkingHourRuleMiddleware,
@@ -153,4 +169,5 @@ module.exports = {
   ruleApplication,
   removeRuleMiddleware,
   findWorkingHourRuleById,
+  checkInTimeRangeMiddleware,
 };

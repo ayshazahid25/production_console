@@ -20,6 +20,13 @@ const schemaWorkingHourRules = new mongoose.Schema(
       min: 1,
       max: 7,
     },
+    //time range
+    checkin_time_start: {
+      type: String,
+    },
+    checkin_time_end: {
+      type: String,
+    },
     applied: {
       type: Boolean,
       default: false,
@@ -44,6 +51,12 @@ function validateWorkingHourRules(data) {
     working_hours_per_day: Joi.number().min(1).max(24),
     break_time: Joi.number().min(0).max(24),
     number_of_working_days: Joi.number().min(1).max(7),
+    checkin_time_start: Joi.string()
+      .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .allow(""),
+    checkin_time_end: Joi.string()
+      .pattern(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .allow(""),
     added_by: Joi.objectId().optional().allow(null).allow("").empty(""),
     updated_by: Joi.objectId().optional().allow(null).allow("").empty(""),
   });

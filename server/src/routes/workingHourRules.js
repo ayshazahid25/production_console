@@ -9,6 +9,7 @@ const {
   applyWorkingHourRule,
   removeWorkingHourRule,
 } = require("../controllers/workingHourRules/workingHourRulesController");
+const moment = require("moment");
 const route = express.Router();
 
 //create
@@ -28,6 +29,32 @@ route.post(
       .withMessage(
         "Number of working days per week must be an integer between 1 and 7."
       ),
+    body("checkin_time_start")
+      .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .withMessage("Check-in time start must be in HH:mm format.")
+      .custom((value, { req }) => {
+        const startTime = req.body.checkin_time_start;
+        const endTime = req.body.checkin_time_end;
+
+        if (!startTime || !endTime) {
+          // If either start or end time is not provided, let other validators handle it
+          return true;
+        }
+
+        const startMoment = moment(startTime, "HH:mm");
+        const endMoment = moment(endTime, "HH:mm");
+
+        if (startMoment.isBefore(endMoment)) {
+          return true;
+        }
+
+        throw new Error(
+          "Check-in time start must be before check-in time end."
+        );
+      }),
+    body("checkin_time_end")
+      .matches(/^([01]\d|2[0-3]):([0-5]\d)$/)
+      .withMessage("Check-in time end must be in HH:mm format."),
   ],
   protect,
   createWorkingHourRule
