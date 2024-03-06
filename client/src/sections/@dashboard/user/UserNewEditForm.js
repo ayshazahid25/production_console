@@ -37,9 +37,9 @@ import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 
 import FormProvider, { RHFTextField, RHFUploadAvatar } from '../../../components/hook-form';
-import ResetPasswordDialogs from '../../../components/user/ResetPasswordDialogs';
+// import ResetPasswordDialogs from '../../../components/user/ResetPasswordDialogs';
 
-import { deleteUserRequest } from '../../../actions/users';
+import { deleteUserRequest } from '../../../actions/user';
 // ----------------------------------------------------------------------
 
 function UserNewEditForm({
@@ -319,7 +319,7 @@ function UserNewEditForm({
     <>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
+          {/* <Grid item xs={12} md={4}>
             <Card sx={{ pt: 10, pb: 5, px: 3 }}>
               <Box sx={{ mb: 5 }}>
                 {onActive === 'leave' && (
@@ -446,7 +446,7 @@ function UserNewEditForm({
                 </Stack>
               )}
             </Card>
-          </Grid>
+          </Grid> */}
 
           <Grid item xs={12} md={8}>
             <Card sx={{ p: 3 }}>
@@ -720,13 +720,16 @@ function UserNewEditForm({
               </Stack>
             </Card>
           </Grid>
+          <Grid item xs={12} md={4}>
+            <h2>ahahah</h2>
+          </Grid>
         </Grid>
       </FormProvider>
-      <ResetPasswordDialogs
+      {/* <ResetPasswordDialogs
         open={open}
         handleClose={handleClose}
         userId={currentUser ? currentUser.id : ''}
-      />
+      /> */}
     </>
   );
 }

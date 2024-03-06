@@ -19,5 +19,14 @@ export const PATH_DASHBOARD = {
 
   category: path(ROOTS_DASHBOARD, 'category'),
 
+  create: path(ROOTS_DASHBOARD, 'create'),
+
   car: path(ROOTS_DASHBOARD, 'car'),
+
+  user: {
+    root: path(ROOTS_DASHBOARD, 'user'),
+    list: path(ROOTS_DASHBOARD, 'user/list'),
+    new: path(ROOTS_DASHBOARD, 'user/new'),
+    details: (id) => path(ROOTS_DASHBOARD, `user/details/${id}`),
+  },
 };

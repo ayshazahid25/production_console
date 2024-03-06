@@ -10,7 +10,15 @@ import DashboardLayout from '../layouts/dashboard';
 // config
 import { PATH_AFTER_LOGIN } from '../config-global';
 //
-import { Page404, DashboardPage, LoginPage, CategoryListPage, CarListPage } from './elements';
+import {
+  Page404,
+  DashboardPage,
+  LoginPage,
+  CategoryListPage,
+  CarListPage,
+  UserCreatePage,
+  UserListPage,
+} from './elements';
 
 // ----------------------------------------------------------------------
 
@@ -44,7 +52,6 @@ export default function Router() {
           path: 'home',
           element: <DashboardPage />,
         },
-
         {
           path: 'category',
           element: (
@@ -57,6 +64,38 @@ export default function Router() {
         {
           path: 'car',
           element: <CarListPage />,
+        },
+
+        /* User */
+        {
+          path: 'user',
+          children: [
+            { element: <Navigate to="/user/list" replace />, index: true },
+            {
+              path: 'list',
+              element: (
+                <RoleGuard permission="userplace_view">
+                  <UserListPage />
+                </RoleGuard>
+              ),
+            },
+            {
+              path: 'new',
+              element: (
+                <RoleGuard permission="userplace_create_view_and_edit">
+                  <UserCreatePage />
+                </RoleGuard>
+              ),
+            },
+            {
+              path: 'details/:id',
+              element: (
+                <RoleGuard permission="userplace_create_view_and_edit">
+                  <UserCreatePage />
+                </RoleGuard>
+              ),
+            },
+          ],
         },
       ],
     },
