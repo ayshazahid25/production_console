@@ -23,11 +23,9 @@ import {
   AnalyticsCurrentSubject,
   AnalyticsConversionRates,
 } from '../../sections/@dashboard/general/analytics';
-import { BookingCheckInWidgets } from '../../sections/@dashboard/general/booking';
-// import { BookingCheckInWidgets } from 'src/sections/@dashboard/general/booking';
+import { AdminDashboard, CheckInCountWidgets } from '../../sections/@dashboard/report';
 
 function DashboardPage({ Auth: { user, isAuthenticated } }) {
-  console.log('user', user);
   const theme = useTheme();
 
   const { themeStretch } = useSettingsContext();
@@ -43,28 +41,13 @@ function DashboardPage({ Auth: { user, isAuthenticated } }) {
           Hi, Welcome back to Production Console
         </Typography>
         {user.is_admin === true ? (
-          <Grid container spacing={3}>
-            <Grid item xs={12} md={12}>
-              <BookingCheckInWidgets
-                chart={{
-                  colors: [theme.palette.warning.main],
-                  pink: [theme.palette.info.main],
-                  red: [theme.palette.error.main],
-
-                  series: [
-                    { label: 'Check In', percent: 72, total: 38566 },
-                    { label: 'Check Out', percent: 64, total: 18472 },
-                    { label: 'Late', percent: 10, total: 23 },
-                    { label: 'On Leave', percent: 64, total: 18472 },
-                  ],
-                }}
-              />
-            </Grid>
-          </Grid>
+          <>
+            <AdminDashboard />
+          </>
         ) : (
           <Grid container spacing={3}>
             <Grid item xs={12} md={12}>
-              <BookingCheckInWidgets
+              <CheckInCountWidgets
                 chart={{
                   colors: [theme.palette.warning.main],
                   red: [theme.palette.error.main],

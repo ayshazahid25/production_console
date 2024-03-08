@@ -7,7 +7,6 @@ import { useSettingsContext } from '../components/settings';
 // ----------------------------------------------------------------------
 
 export default function PageOne() {
-  console.log('hyyy');
   const { themeStretch } = useSettingsContext();
 
   return (
