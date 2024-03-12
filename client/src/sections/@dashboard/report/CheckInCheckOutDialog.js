@@ -83,7 +83,7 @@ function CheckInCheckOutDialog({
   return (
     <>
       <Button
-        sx={{ mb: 3, float: 'right' }}
+        sx={{ float: 'right' }}
         variant="soft"
         onClick={handleClickOpen}
         startIcon={
