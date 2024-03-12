@@ -465,6 +465,7 @@ const remainingWorkingHoursMiddleware = (checkIns, totalOfficeHours) => {
 //middleware to calculate working hours of day and week
 const getTotalWorkingHoursOfDayAndWeek = (rules) => {
   const totalOfficeHoursDaily = rules.working_hours_per_day + rules.break_time;
+
   // Calculate total working hours for the month based on the fixed number of working days per week
   const totalOfficeHoursWeekly =
     totalOfficeHoursDaily * rules.number_of_working_days;

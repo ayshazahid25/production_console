@@ -23,6 +23,13 @@ export default function report(state = INITIAL_STATE, action) {
         loading: action.payload.loading,
       };
     }
+    case types.RECORD_CHECKINS_RESQUEST_SUCCESS: {
+      return {
+        ...state,
+        message: action.payload.message,
+        error: null,
+      };
+    }
     case types.REPORT_ERROR: {
       return {
         ...state,

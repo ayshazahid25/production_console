@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { useTheme } from '@mui/material/styles';
-import { Grid, LinearProgress, Paper, Stack } from '@mui/material';
+import { Box, Grid, LinearProgress, Paper, Stack } from '@mui/material';
 
 import { getAdminDashboardRequest, clearAdminDashbaordData } from '../../../actions/report';
 
@@ -60,41 +60,43 @@ function AdminDashboard({
       ) : (
         <>
           {adminDasboardData && (
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6} md={3}>
-                <CheckInCountWidgets
-                  percent={adminDasboardData.onTimePercentage}
-                  title="On-Time Arrivals"
-                  total={adminDasboardData.onTimeCheckIns}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <CheckInCountWidgets
-                  percent={adminDasboardData.latePercentage}
-                  title="Late Arrivals"
-                  total={adminDasboardData.lateCheckIns}
-                  color="warning"
-                />
-              </Grid>
+            <>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6} md={3}>
+                  <CheckInCountWidgets
+                    percent={adminDasboardData.onTimePercentage}
+                    title="On-Time Arrivals"
+                    total={adminDasboardData.onTimeCheckIns}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <CheckInCountWidgets
+                    percent={adminDasboardData.latePercentage}
+                    title="Late Arrivals"
+                    total={adminDasboardData.lateCheckIns}
+                    color="warning"
+                  />
+                </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <CheckInCountWidgets
-                  percent={adminDasboardData.notCheckedInPercentage}
-                  title="Employees Not Checked In"
-                  total={adminDasboardData.notCheckedIn}
-                  color="error"
-                />
-              </Grid>
+                <Grid item xs={12} sm={6} md={3}>
+                  <CheckInCountWidgets
+                    percent={adminDasboardData.notCheckedInPercentage}
+                    title="Employees Not Checked In"
+                    total={adminDasboardData.notCheckedIn}
+                    color="error"
+                  />
+                </Grid>
 
-              <Grid item xs={12} sm={6} md={3}>
-                <CheckInCountWidgets
-                  percent={adminDasboardData.usersOnLeavePercentage}
-                  title="Employees On Leave"
-                  total={adminDasboardData.usersOnLeave}
-                  color="info"
-                />
+                <Grid item xs={12} sm={6} md={3}>
+                  <CheckInCountWidgets
+                    percent={adminDasboardData.usersOnLeavePercentage}
+                    title="Employees On Leave"
+                    total={adminDasboardData.usersOnLeave}
+                    color="info"
+                  />
+                </Grid>
               </Grid>
-            </Grid>
+            </>
           )}
         </>
       )}

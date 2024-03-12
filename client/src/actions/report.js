@@ -1,5 +1,22 @@
 import * as types from './index';
 
+// ********** CHECKIN CHECKOUT **********
+// send the request to record checkin or checkout value
+export const recordCheckInRequest = (data) => ({
+  type: types.RECORD_CHECKINS_RESQUEST,
+  payload: {
+    data,
+  },
+});
+// successfully recorded checkin or checkout value
+export const recordCheckInSuccess = ({ message }) => ({
+  type: types.RECORD_CHECKINS_RESQUEST_SUCCESS,
+  payload: {
+    message,
+  },
+});
+
+// ********** DASHBOARD **********
 // send the request to fetch admin dashboard reports of checkIn, late checkIns, and users on leave
 export const getAdminDashboardRequest = () => ({
   type: types.GET_ADMIN_DASHOARD_CHECKIN_REPORT_REQUEST,

@@ -76,6 +76,9 @@ const addUserMiddleware = async (userDetails) => {
 // Send mesage to db
 const getUserById = async (userId) => {
   try {
+    const todayStart = new Date(); // Get the current date
+    todayStart.setHours(0, 0, 0, 0); // Set the time to the start of the day
+
     const id = new ObjectId(userId);
     const user = await Users.aggregate([
       {
@@ -119,6 +122,73 @@ const getUserById = async (userId) => {
             },
           },
         },
+      },
+      //get last check data
+      {
+        $lookup: {
+          from: "checkins",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$user", "$$userId"] },
+              },
+            },
+          ],
+          as: "lastCheckIn",
+        },
+      },
+
+      {
+        $unwind: { path: "$lastCheckIn", preserveNullAndEmptyArrays: true }, // Unwind the lastCheckIn array
+      },
+      {
+        $sort: { "lastCheckIn.updatedAt": -1 }, // Sort checkins by timestamp in descending order
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by user ID
+          user: { $first: "$$ROOT" }, // Keep the first document (latest checkin)
+        },
+      },
+      {
+        $replaceRoot: { newRoot: "$user" }, // Replace the root with the user document
+      },
+
+      //get todays data too
+      {
+        $lookup: {
+          from: "checkins",
+          let: { userId: "$_id" },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ["$user", "$$userId"] },
+                    { $gte: ["$createdAt", todayStart] },
+                  ],
+                },
+              },
+            },
+          ],
+          as: "todayCheckIn",
+        },
+      },
+      {
+        $unwind: { path: "$todayCheckIn", preserveNullAndEmptyArrays: true }, // Unwind the todayCheckIn array
+      },
+      {
+        $sort: { "todayCheckIn.createdAt": 1 }, // Sort checkins by timestamp in descending order
+      },
+      {
+        $group: {
+          _id: "$_id", // Group by user ID
+          user: { $first: "$$ROOT" }, // Keep the first document (latest checkin)
+        },
+      },
+      {
+        $replaceRoot: { newRoot: "$user" }, // Replace the root with the user document
       },
       {
         $project: {

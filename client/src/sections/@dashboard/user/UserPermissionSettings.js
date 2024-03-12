@@ -219,7 +219,7 @@ function UserPermissionSettings({
               {currentUser
                 ? ` ${currentUser.first_name} ${currentUser.last_name} (${currentUser.email}) `
                 : ''}
-              in BUGGAZ
+              in Production Console
             </Typography>
             {RadioMenuList.map((RadioMenu, index) => (
               <Box key={index} rowGap={1} display="grid" sx={{ my: 3 }}>

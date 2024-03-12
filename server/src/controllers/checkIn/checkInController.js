@@ -32,7 +32,6 @@ const recordCheckInOut = asyncHandler(async (req, res) => {
   expressValidatorError(req);
   const checkIns = req.body;
   checkIns.user = req.result._id.toString();
-  delete checkIns.manual;
 
   try {
     // create admin

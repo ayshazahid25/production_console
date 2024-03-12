@@ -26,28 +26,6 @@ route.post(
       .toDate()
       .optional({ checkFalsy: true })
       .withMessage("Please enter a valid check-out date"),
-    body("manual", "Manual must be a boolean value")
-      .isBoolean()
-      .custom((manual, { req }) => {
-        if (!manual) {
-          if (req.body.check_in_time && req.body.check_out_time) {
-            throw new Error("Provide either check in or check out, not both.");
-          }
-
-          return true;
-        } else {
-          if (manual && !req.body.check_in_time) {
-            throw new Error("Provide check in value.");
-          }
-          const check_in_time = new Date(req.body.check_in_time).getTime();
-          const check_out_time = new Date(req.body.check_out_time).getTime();
-
-          if (check_in_time > check_out_time) {
-            throw new Error("Check-in time must be before check-out time");
-          }
-          return true;
-        }
-      }),
   ],
   protect,
   recordCheckInOut
