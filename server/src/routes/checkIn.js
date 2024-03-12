@@ -73,6 +73,9 @@ route.get(
   getAllCheckIns
 );
 
+//get user's remaining working hours
+route.get("/report", protect, reportOfRemainingWorkingHours);
+
 //get admin dashboard
 route.get("/admin-dashboard/", protect, adminDashboard);
 
@@ -95,14 +98,6 @@ route.get(
   ],
   protect,
   getAllCheckInsByUserId
-);
-
-//get user's remaining working hours
-route.get(
-  "/report/:id",
-  [param("id").isMongoId().withMessage("Please enter a valid user id")],
-  protect,
-  reportOfRemainingWorkingHours
 );
 
 //get user's working hours of specific month

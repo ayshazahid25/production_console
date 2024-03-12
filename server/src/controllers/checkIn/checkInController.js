@@ -220,16 +220,9 @@ const getAllCheckInsByUserId = asyncHandler(async (req, res) => {
 // @route GET /api/check_in/report/:id
 // @access Private
 const reportOfRemainingWorkingHours = asyncHandler(async (req, res) => {
-  if (req.params.id !== req.result._id.toString()) {
-    res.status(400);
-    throw new Error("You are not allowed to perform this action");
-  }
-
-  expressValidatorError(req);
-
   try {
     //get user today's check in and check out record
-    const todayCheckIns = await getUserTodaysCheckIns(req.params.id);
+    const todayCheckIns = await getUserTodaysCheckIns(req.result._id);
 
     if (!todayCheckIns) {
       res.status(400);
@@ -239,7 +232,7 @@ const reportOfRemainingWorkingHours = asyncHandler(async (req, res) => {
     }
 
     //get user weekly check in and check out record
-    const weeklyCheckIns = await getUserWeeklyCheckIns(req.params.id);
+    const weeklyCheckIns = await getUserWeeklyCheckIns(req.result._id);
 
     if (!weeklyCheckIns) {
       res.status(400);
@@ -249,7 +242,7 @@ const reportOfRemainingWorkingHours = asyncHandler(async (req, res) => {
     }
 
     //get user monthly check in and check out record
-    const monthlyCheckIns = await getUserMonthlyCheckIns(req.params.id);
+    const monthlyCheckIns = await getUserMonthlyCheckIns(req.result._id);
 
     if (!monthlyCheckIns) {
       res.status(400);
