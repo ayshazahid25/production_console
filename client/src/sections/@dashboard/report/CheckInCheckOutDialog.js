@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
+import useMediaQuery from '@mui/material/useMediaQuery';
 import {
   IconButton,
   Button,
@@ -14,6 +15,7 @@ import {
   DialogContent,
   DialogActions,
   Box,
+  useTheme,
 } from '@mui/material';
 import { useSnackbar } from '../../../components/snackbar';
 import FormProvider, { RHFTextField } from '../../../components/hook-form';
@@ -33,6 +35,8 @@ function CheckInCheckOutDialog({
   clearError,
   lastCheckIn,
 }) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('md'));
   const [open, setOpen] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
 
@@ -60,6 +64,10 @@ function CheckInCheckOutDialog({
     setOpen(false);
   };
 
+  const minDateTimeValue = new Date(
+    lastCheckIn.check_out_time ? lastCheckIn.check_out_time : lastCheckIn.check_in_time
+  );
+
   const defaultTimeValue = useMemo(() => new Date(), []);
 
   const methods = useForm({
@@ -83,7 +91,7 @@ function CheckInCheckOutDialog({
   return (
     <>
       <Button
-        sx={{ float: 'right' }}
+        sx={{ float: isSmallScreen ? 'left' : 'right' }}
         variant="soft"
         onClick={handleClickOpen}
         startIcon={
@@ -101,6 +109,7 @@ function CheckInCheckOutDialog({
           <DialogContent>
             <Box sx={{ mt: 2 }}>
               <PickerDateTime
+                minDateTimeValue={minDateTimeValue}
                 value={defaultTimeValue}
                 onTimeChange={(newTime) => methods.setValue('time', newTime)}
               />
