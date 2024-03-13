@@ -2,6 +2,7 @@ import * as types from '../actions';
 
 const INITIAL_STATE = {
   adminDashboard: null,
+  workingReport: null,
   loading: false,
   message: null,
   error: null,
@@ -23,7 +24,16 @@ export default function report(state = INITIAL_STATE, action) {
         loading: action.payload.loading,
       };
     }
+    case types.GET_REPORT_OF_REMAINING_WORKING_HOURS_SUCCESS: {
+      return {
+        ...state,
+        workingReport: action.payload.report,
+        message: null,
+        error: null,
+      };
+    }
     case types.RECORD_CHECKINS_RESQUEST_SUCCESS: {
+      console.log('action.payload.message::', action.payload.message);
       return {
         ...state,
         message: action.payload.message,

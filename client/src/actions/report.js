@@ -15,6 +15,18 @@ export const recordCheckInSuccess = ({ message }) => ({
     message,
   },
 });
+// send the request to get user's working time and remaing time
+export const getReportOfRemainingWorkingHoursRequest = () => ({
+  type: types.GET_REPORT_OF_REMAINING_WORKING_HOURS_REQUEST,
+});
+
+// successfully fetched user's working time and remaing time
+export const getReportOfRemainingWorkingHoursRequestSuccess = ({ report }) => ({
+  type: types.GET_REPORT_OF_REMAINING_WORKING_HOURS_SUCCESS,
+  payload: {
+    report,
+  },
+});
 
 // ********** DASHBOARD **********
 // send the request to fetch admin dashboard reports of checkIn, late checkIns, and users on leave
@@ -43,6 +55,10 @@ export const reportError = ({ error }) => ({
   payload: {
     error,
   },
+});
+
+export const clearReportData = () => ({
+  type: types.CLEAR_REPORT_DATA,
 });
 
 export const clearAdminDashbaordData = () => ({

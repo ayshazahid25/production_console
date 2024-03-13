@@ -6,6 +6,7 @@ import * as authApi from '../api/auth';
 import * as types from '../actions';
 import { setSession } from '../auth/utils';
 
+// ********** GET ADMIN DAHSBOARD REPORT **********
 function* getAdminDashoard() {
   try {
     yield put(
@@ -56,8 +57,14 @@ function* watchGetAdminDashboardRequest() {
   yield takeEvery(types.GET_ADMIN_DASHOARD_CHECKIN_REPORT_REQUEST, getAdminDashoard);
 }
 
+// ********** RECORD CHECK IN OR CHECK OUT **********
 function* recordCheckIns({ payload }) {
   try {
+    yield put(
+      actions.setLoading({
+        loading: true,
+      })
+    );
     const response = yield call(api.recordCheckIns, payload.data);
 
     yield put(
@@ -75,6 +82,14 @@ function* recordCheckIns({ payload }) {
       })
       // isAuthenticated: true,
     );
+
+    // Call getReportOfRemainingWorkingHours after recording check-in/check-out
+    yield call(getReportOfRemainingWorkingHours);
+    yield put(
+      actions.setLoading({
+        loading: false,
+      })
+    );
   } catch (e) {
     if (e.message === 'Error: Not authorized, no token') {
       setSession(null);
@@ -86,6 +101,11 @@ function* recordCheckIns({ payload }) {
         })
       );
     } else {
+      yield put(
+        actions.setLoading({
+          loading: false,
+        })
+      );
       yield put(
         actions.reportError({
           error: e.message || e,
@@ -99,6 +119,62 @@ function* watchRecordCheckInsRequest() {
   yield takeLatest(types.RECORD_CHECKINS_RESQUEST, recordCheckIns);
 }
 
-const reportSagas = [fork(watchGetAdminDashboardRequest), fork(watchRecordCheckInsRequest)];
+// ********** GET REPORT OF REMAINING WORKING HOURS **********
+function* getReportOfRemainingWorkingHours() {
+  try {
+    yield put(
+      actions.setLoading({
+        loading: true,
+      })
+    );
+    const result = yield call(api.getReportOfRemainingWorkingHours);
+
+    yield put(
+      actions.getReportOfRemainingWorkingHoursRequestSuccess({
+        report: result.data,
+      })
+    );
+    yield put(
+      actions.setLoading({
+        loading: false,
+      })
+    );
+  } catch (e) {
+    if (e.message === 'Error: Not authorized, no token') {
+      setSession(null);
+      yield put(authActions.logoutRequest());
+
+      yield put(
+        authActions.loginError({
+          error: e.message,
+        })
+      );
+    } else {
+      yield put(
+        actions.setLoading({
+          loading: true,
+        })
+      );
+      yield put(
+        actions.reportError({
+          error: e.message,
+        })
+      );
+    }
+  }
+}
+
+function* watchGetReportOfRemainingWorkingHoursRequest() {
+  yield takeEvery(
+    types.GET_REPORT_OF_REMAINING_WORKING_HOURS_REQUEST,
+    getReportOfRemainingWorkingHours
+  );
+}
+
+const reportSagas = [
+  fork(watchGetAdminDashboardRequest),
+  fork(watchRecordCheckInsRequest),
+  fork(watchGetReportOfRemainingWorkingHoursRequest),
+];
 
 export default reportSagas;
