@@ -428,40 +428,45 @@ const getUserMonthlyCheckIns = async (userId) => {
 //get today's working remaining working hours
 const remainingWorkingHoursMiddleware = (checkIns, totalOfficeHours) => {
   //first check if there is check-in and also check-out then firs calculate the time interval
-  let totalWorkedMiliseconds = 0;
+  let totalWorkedMilliseconds = 0;
   checkIns.map((checkIn) => {
     if (checkIn.check_in_time && checkIn.check_out_time) {
       const checkInTime = new Date(checkIn.check_in_time);
       const checkOutTime = new Date(checkIn.check_out_time);
 
-      const remainingTime = checkOutTime - checkInTime;
+      const workedTime = checkOutTime - checkInTime;
 
-      totalWorkedMiliseconds = totalWorkedMiliseconds + remainingTime;
+      totalWorkedMilliseconds += workedTime;
     } else {
       const currentTime = new Date();
       const checkInTime = new Date(checkIn.check_in_time);
 
-      const remainingTime = currentTime - checkInTime;
+      const workedTime = currentTime - checkInTime;
 
-      totalWorkedMiliseconds = totalWorkedMiliseconds + remainingTime;
+      totalWorkedMilliseconds += workedTime;
     }
   });
 
-  //we got complete working record in miliseconds
-  //now calculate the remaining time
-  const hours = totalOfficeHours;
-  const totalWorkingMilliseconds = hours * 3600000;
+  // Calculate the total working time in milliseconds for a day
+  const totalWorkingMilliseconds = totalOfficeHours * 3600000;
 
-  const remainingWorkingTime =
-    totalWorkingMilliseconds - totalWorkedMiliseconds;
+  // Calculate remaining and overtime
+  const remainingMilliseconds = Math.max(
+    0,
+    totalWorkingMilliseconds - totalWorkedMilliseconds
+  );
+  const overTimeMilliseconds = Math.max(
+    0,
+    totalWorkedMilliseconds - totalWorkingMilliseconds
+  );
 
   return {
-    overTime: remainingWorkingTime < 0 ? true : false,
-    remainingTime: convertMsToTime(Math.abs(remainingWorkingTime)),
-    totalWorkingDuration: convertMsToTime(Math.abs(totalWorkedMiliseconds)),
+    overTime: overTimeMilliseconds > 0,
+    remainingTime: convertMsToTime(remainingMilliseconds),
+    totalWorkingDuration: convertMsToTime(totalWorkedMilliseconds),
+    overTimeDuration: convertMsToTime(overTimeMilliseconds),
   };
 };
-
 //middleware to calculate working hours of day and week
 const getTotalWorkingHoursOfDayAndWeek = (rules) => {
   const totalOfficeHoursDaily = rules.working_hours_per_day + rules.break_time;
