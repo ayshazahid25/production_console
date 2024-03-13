@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 
 // ----------------------------------------------------------------------
 
-function PickerDateTime({ value, onTimeChange }) {
+function PickerDateTime({ minDateTimeValue, value, onTimeChange }) {
   const [internalValue, setInternalValue] = useState(value);
 
   const handleTimeChange = (newValue) => {
@@ -25,12 +25,14 @@ function PickerDateTime({ value, onTimeChange }) {
       value={internalValue}
       onChange={handleTimeChange}
       maxDateTime={value}
+      minDateTime={minDateTimeValue}
       renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
     />
   );
 }
 
 PickerDateTime.propTypes = {
+  minDateTimeValue: PropTypes.instanceOf(Date).isRequired,
   value: PropTypes.instanceOf(Date).isRequired,
   onTimeChange: PropTypes.func.isRequired,
 };
