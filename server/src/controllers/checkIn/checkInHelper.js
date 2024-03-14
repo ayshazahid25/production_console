@@ -130,7 +130,7 @@ const getAllCheckInsMiddleware = async (body) => {
     });
 };
 
-//get all check-in check-outs of specific user
+// get all check-in check-outs of specific user
 const getAllCheckInsByUserIdAndMonthMiddleware = async (
   userId,
   specificMonth
@@ -210,6 +210,98 @@ const getAllCheckInsByUserIdAndMonthMiddleware = async (
       $sort: {
         "_id.year": -1,
         "_id.month": -1,
+      },
+    },
+  ])
+    .then((result) => {
+      return result;
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
+};
+
+// get all check-in check-outs of specific user group by days
+const getAllCheckInsByUserIdAndMonthGroupByDaysMiddleware = async (
+  userId,
+  specificMonth
+) => {
+  const id = new ObjectId(userId);
+
+  let condition = {};
+
+  // If user filters a specific month then
+  if (specificMonth) {
+    // Input in the format "YYYY-MM"
+    const [year, month] = specificMonth.split("-").map(Number);
+
+    const startDate = new Date(year, month - 1, 1); // Month is zero-based in JavaScript
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999);
+
+    condition["createdAt"] = {
+      $gte: startDate,
+      $lte: endOfMonth,
+    };
+  } else {
+    // Otherwise return data of the current month
+    const currentDate = new Date();
+    const startOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      1
+    );
+    const endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
+    condition["createdAt"] = {
+      $gte: startOfMonth,
+      $lte: endOfMonth,
+    };
+  }
+
+  // Add user id too
+  condition["user"] = {
+    $eq: id,
+  };
+
+  console.log("condition:::::", condition);
+  return CheckIns.aggregate([
+    {
+      $match: condition,
+    },
+    {
+      $project: {
+        check_in_time: 1,
+        check_out_time: 1,
+        createdAt: 1,
+        updatedAt: 1,
+        day: { $dayOfMonth: { date: "$createdAt", timezone: "UTC" } },
+        month: { $month: { date: "$createdAt", timezone: "UTC" } },
+        year: { $year: { date: "$createdAt", timezone: "UTC" } },
+      },
+    },
+    {
+      $group: {
+        _id: {
+          year: "$year",
+          month: "$month",
+          day: "$day",
+        },
+        checkIns: { $push: "$$ROOT" },
+      },
+    },
+    {
+      $sort: {
+        "_id.year": -1,
+        "_id.month": -1,
+        "_id.day": -1,
       },
     },
   ])
@@ -467,6 +559,7 @@ const remainingWorkingHoursMiddleware = (checkIns, totalOfficeHours) => {
     overTimeDuration: convertMsToTime(overTimeMilliseconds),
   };
 };
+
 //middleware to calculate working hours of day and week
 const getTotalWorkingHoursOfDayAndWeek = (rules) => {
   const totalOfficeHoursDaily = rules.working_hours_per_day + rules.break_time;
@@ -594,6 +687,7 @@ module.exports = {
   recordCheckOutMiddleware,
   getAllCheckInsMiddleware,
   getAllCheckInsByUserIdAndMonthMiddleware,
+  getAllCheckInsByUserIdAndMonthGroupByDaysMiddleware,
   getAllCheckInsByUserIdAndYearMiddleware,
   getUserTodaysCheckIns,
   getUserWeeklyCheckIns,

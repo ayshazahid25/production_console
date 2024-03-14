@@ -16,6 +16,7 @@ const {
   getTotalWorkingHoursOfDayAndWeek,
   getTotalWorkingHoursYearly,
   getUserTodaysRecordForAdmin,
+  getAllCheckInsByUserIdAndMonthGroupByDaysMiddleware,
 } = require("./checkInHelper");
 const { expressValidatorError } = require("../../middleware/commonMiddleware");
 const {
@@ -370,6 +371,79 @@ const reportOfWorkingHoursOfMonth = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc get report by month of each day
+// @route GET /api/check_in/report-month-each-day/
+// @access Private
+const reportOfWorkingHoursOfMonthByEachDay = asyncHandler(async (req, res) => {
+  expressValidatorError(req);
+
+  try {
+    //get all checkIns
+    const checkIns = await getAllCheckInsByUserIdAndMonthGroupByDaysMiddleware(
+      req.result._id,
+      req.body.specificMonth
+    );
+    console.log("checkIns::", checkIns);
+    if (!checkIns) {
+      res.status(400);
+      throw new Error("Unable to find any check-in/check-out!");
+    }
+
+    //now get applied working hour rule
+    const rules = await getAppliedWorkingHourRuleMiddleware();
+
+    if (!rules) {
+      res.status(400);
+      throw new Error("No rule found!");
+    }
+
+    const { totalOfficeHoursDaily } = getTotalWorkingHoursOfDayAndWeek(
+      rules[0]
+    );
+
+    // Get monthly working hours broken down by each day
+    const monthlyReport = checkIns.map((checkInGroup) => {
+      const { year, month, day } = checkInGroup._id;
+
+      const dailyReport = remainingWorkingHoursMiddleware(
+        checkInGroup.checkIns,
+        totalOfficeHoursDaily
+      );
+
+      return {
+        year,
+        month,
+        day,
+        report: {
+          date: new Date(year, month - 1, day), // Create a Date object for the specific day
+          overtime: dailyReport.overTime,
+          workedHours: dailyReport.totalWorkingDuration,
+          overTimeDuration: dailyReport.overTimeDuration,
+        },
+      };
+    });
+
+    res.status(200).json({
+      monthlyReport,
+    });
+  } catch (error) {
+    res.status(
+      error.statusCode
+        ? error.statusCode
+        : res.statusCode
+        ? res.statusCode
+        : 500
+    );
+    throw new Error(
+      `${
+        error.statusCode !== 400 && res.statusCode !== 400
+          ? "Something went wrong while fetching check-in/check-out data: "
+          : ""
+      }${error.message}`
+    );
+  }
+});
+
 // @desc get report by specific year
 // @route GET /api/check_in/report-yearly/:id
 // @access Private
@@ -543,6 +617,7 @@ module.exports = {
   getAllCheckInsByUserId,
   reportOfRemainingWorkingHours,
   reportOfWorkingHoursOfMonth,
+  reportOfWorkingHoursOfMonthByEachDay,
   reportOfWorkingHoursOfYear,
   adminDashboard,
 };

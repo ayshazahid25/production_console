@@ -9,6 +9,7 @@ const {
   reportOfWorkingHoursOfMonth,
   reportOfWorkingHoursOfYear,
   adminDashboard,
+  reportOfWorkingHoursOfMonthByEachDay,
 } = require("../controllers/checkIn/checkInController");
 const route = express.Router();
 
@@ -76,6 +77,26 @@ route.get(
 //get user's remaining working hours
 route.get("/report", protect, reportOfRemainingWorkingHours);
 
+//get user's working hours of month by each day
+route.get(
+  "/report-month-each-day",
+  [
+    body("specificMonth", "Enter a valid date for specificMonth")
+      .optional({ checkFalsy: true })
+      .custom((value, { req }) => {
+        const regex = /^\d{4}\-(0?[1-9]|1[012])$/;
+
+        if (!regex.test(value)) {
+          throw new Error("Please enter a valid yyyy-mm format.");
+        }
+
+        return true;
+      }),
+  ],
+  protect,
+  reportOfWorkingHoursOfMonthByEachDay
+);
+
 //get admin dashboard
 route.get("/admin-dashboard/", protect, adminDashboard);
 
@@ -120,6 +141,7 @@ route.get(
   protect,
   reportOfWorkingHoursOfMonth
 );
+
 route.get(
   "/report-yearly/:id",
   [
