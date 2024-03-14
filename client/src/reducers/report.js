@@ -33,7 +33,6 @@ export default function report(state = INITIAL_STATE, action) {
       };
     }
     case types.RECORD_CHECKINS_RESQUEST_SUCCESS: {
-      console.log('action.payload.message::', action.payload.message);
       return {
         ...state,
         message: action.payload.message,
@@ -44,6 +43,14 @@ export default function report(state = INITIAL_STATE, action) {
       return {
         ...state,
         error: action.payload.error,
+      };
+    }
+    case types.CLEAR_REPORT_DATA: {
+      return {
+        ...state,
+        workingReport: null,
+        message: null,
+        error: null,
       };
     }
     case types.CLEAR_ADMIN_DASHBOARD_DATA: {

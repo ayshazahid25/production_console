@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
@@ -25,6 +25,9 @@ function DashboardPage({
   const navigate = useNavigate();
   const theme = useTheme();
   const { themeStretch } = useSettingsContext();
+  const [selectedReportType, setSelectedReportType] = useState('dailyReport');
+
+  console.log('selectedReportType::', selectedReportType);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -48,6 +51,13 @@ function DashboardPage({
     []
   );
 
+  // Dynamically generate the title based on the selected report type
+  const dynamicTitle =
+    selectedReportType === 'dailyReport'
+      ? "Today's Report"
+      : selectedReportType === 'weeklyReport'
+      ? "This Week's Report"
+      : "This Month's Report";
   return (
     <>
       <Helmet>
@@ -96,16 +106,14 @@ function DashboardPage({
               <Grid item xs={12} md={6} lg={6} sx={{ mb: 3 }}>
                 {workingReport && (
                   <AppCurrentDownload
-                    title="Today's Working"
-                    subheader="Worked vs Remaining"
+                    title={dynamicTitle}
+                    subheader="Worked / Remaining / Overtime"
                     chart={{
                       colors: [theme.palette.primary.main, theme.palette.error.main],
-                      series: [
-                        { label: 'Worked', value: workingReport.dailyReport.totalWorkingDuration },
-                        { label: 'Remaining', value: workingReport.dailyReport.remainingTime },
-                      ],
                     }}
                     workingReport={workingReport}
+                    selectedReportType={selectedReportType}
+                    onSelectReportType={setSelectedReportType}
                   />
                 )}
               </Grid>

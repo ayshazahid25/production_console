@@ -1,7 +1,15 @@
 import PropTypes from 'prop-types';
 // @mui
 import { useTheme, styled } from '@mui/material/styles';
-import { Card, CardHeader } from '@mui/material';
+import {
+  Card,
+  CardHeader,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from '@mui/material';
 // utils
 import { fNumber } from '../../../../utils/formatNumber';
 // components
@@ -34,20 +42,31 @@ const StyledChart = styled('div')(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 AppCurrentDownload.propTypes = {
-  chart: PropTypes.object,
   title: PropTypes.string,
   subheader: PropTypes.string,
+  chart: PropTypes.object,
   workingReport: PropTypes.object,
+  selectedReportType: PropTypes.string.isRequired,
+  onSelectReportType: PropTypes.func.isRequired,
 };
-
-export default function AppCurrentDownload({ title, subheader, chart, workingReport, ...other }) {
+export default function AppCurrentDownload({
+  title,
+  subheader,
+  chart,
+  workingReport,
+  selectedReportType,
+  onSelectReportType,
+  ...other
+}) {
   const theme = useTheme();
 
-  const { colors, series, options } = chart;
+  const { colors, options } = chart;
+
   // Extract today's working, remaining, and overtime duration from workingReport
-  const todayWorkingTime = workingReport?.dailyReport?.totalWorkingDuration || {};
-  const todayRemainingTime = workingReport?.dailyReport?.remainingTime || {};
-  const todayOvertime = workingReport?.dailyReport?.overTimeDuration || {};
+  const selectedReport = workingReport[selectedReportType] || {};
+  const todayWorkingTime = selectedReport.totalWorkingDuration || {};
+  const todayRemainingTime = selectedReport.remainingTime || {};
+  const todayOvertime = selectedReport.overTimeDuration || {};
 
   // Convert hours, minutes, and seconds into total seconds
   const totalSecondsWorked =
@@ -72,8 +91,6 @@ export default function AppCurrentDownload({ title, subheader, chart, workingRep
     },
     colors,
     labels: chartLabels,
-
-    stroke: { colors: [theme.palette.background.paper] },
     legend: { floating: true, horizontalAlign: 'center' },
     tooltip: {
       fillSeriesColor: false,
@@ -120,7 +137,25 @@ export default function AppCurrentDownload({ title, subheader, chart, workingRep
 
   return (
     <Card {...other}>
-      <CardHeader title={title} subheader={subheader} />
+      <CardHeader
+        title={title}
+        subheader={subheader}
+        action={
+          <TextField
+            variant="outlined"
+            select
+            fullWidth
+            label="Select"
+            value={selectedReportType}
+            onChange={(e) => onSelectReportType(e.target.value)}
+            helperText="Please select your currency"
+          >
+            <MenuItem value="dailyReport">Daily</MenuItem>
+            <MenuItem value="weeklyReport">Weekly</MenuItem>
+            <MenuItem value="monthlyReport">Monthly</MenuItem>
+          </TextField>
+        }
+      />
 
       <StyledChart dir="ltr">
         <Chart type="donut" series={chartSeries} options={chartOptions} height={280} />
