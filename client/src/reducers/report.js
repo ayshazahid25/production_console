@@ -2,7 +2,7 @@ import * as types from '../actions';
 
 const INITIAL_STATE = {
   adminDashboard: null,
-  workingReport: null,
+  monthlyWorkingReport: null,
   loading: false,
   message: null,
   error: null,
@@ -32,6 +32,14 @@ export default function report(state = INITIAL_STATE, action) {
         error: null,
       };
     }
+    case types.GET_REPORT_OF_REMAINING_WORKING_HOURS_OF_MONTH_BY_DAYS_SUCCESS: {
+      return {
+        ...state,
+        monthlyWorkingReport: action.payload.report,
+        message: null,
+        error: null,
+      };
+    }
     case types.RECORD_CHECKINS_RESQUEST_SUCCESS: {
       return {
         ...state,
@@ -49,6 +57,7 @@ export default function report(state = INITIAL_STATE, action) {
       return {
         ...state,
         workingReport: null,
+        monthlyWorkingReport: null,
         message: null,
         error: null,
       };

@@ -78,7 +78,7 @@ route.get(
 route.get("/report", protect, reportOfRemainingWorkingHours);
 
 //get user's working hours of month by each day
-route.get(
+route.post(
   "/report-month-each-day",
   [
     body("specificMonth", "Enter a valid date for specificMonth")

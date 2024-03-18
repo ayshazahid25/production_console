@@ -14,20 +14,25 @@ import { AdminDashboard } from '../../sections/@dashboard/report';
 import CheckInCheckOutDialog from '../../sections/@dashboard/report/CheckInCheckOutDialog';
 import { PATH_AUTH } from '../../routes/paths';
 import { AppCurrentDownload } from '../../sections/@dashboard/general/app';
-import { getReportOfRemainingWorkingHoursRequest, clearReportData } from '../../actions/report';
+import {
+  getReportOfRemainingWorkingHoursRequest,
+  getReportOfRemainingWorkingHoursOfMonthByDaysRequest,
+  clearReportData,
+} from '../../actions/report';
+import MonthlyReportChart from '../../sections/@dashboard/general/app/MonthlyReportChart';
+import formatDate from '../../utils/formateMonthAndYear';
 
 function DashboardPage({
   Auth: { user, isAuthenticated },
-  Reports: { workingReport, loading },
+  Reports: { workingReport, monthlyWorkingReport, loading },
   getRemainingWorkingHours,
+  getRemainingWorkingHoursOfMonth,
   clrReportData,
 }) {
   const navigate = useNavigate();
   const theme = useTheme();
   const { themeStretch } = useSettingsContext();
   const [selectedReportType, setSelectedReportType] = useState('dailyReport');
-
-  console.log('selectedReportType::', selectedReportType);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -41,10 +46,14 @@ function DashboardPage({
       getRemainingWorkingHours();
     }
     // eslint-disable-next-line
-  }, [
-    workingReport,
-    // error
-  ]);
+  }, [workingReport]);
+  useEffect(() => {
+    if (monthlyWorkingReport == null) {
+      const formattedDate = formatDate(new Date());
+      getRemainingWorkingHoursOfMonth({ specificMonth: formattedDate });
+    }
+    // eslint-disable-next-line
+  }, [monthlyWorkingReport]);
   useEffect(
     () => () => clrReportData(),
     // eslint-disable-next-line
@@ -103,7 +112,7 @@ function DashboardPage({
                   <Typography>No check-in recorded for today.</Typography>
                 )}
               </Grid>
-              <Grid item xs={12} md={6} lg={6} sx={{ mb: 3 }}>
+              <Grid item xs={12} md={12} lg={6} sx={{ mb: 3 }}>
                 {workingReport && (
                   <AppCurrentDownload
                     title={dynamicTitle}
@@ -115,6 +124,11 @@ function DashboardPage({
                     selectedReportType={selectedReportType}
                     onSelectReportType={setSelectedReportType}
                   />
+                )}
+              </Grid>
+              <Grid item xs={12} md={12} lg={6} sx={{ mb: 3 }}>
+                {monthlyWorkingReport && (
+                  <MonthlyReportChart monthlyReport={monthlyWorkingReport} />
                 )}
               </Grid>
               {user.is_admin === true ? (
@@ -138,6 +152,7 @@ DashboardPage.propTypes = {
   Auth: PropTypes.object.isRequired,
   Reports: PropTypes.object.isRequired,
   getRemainingWorkingHours: PropTypes.func.isRequired,
+  getRemainingWorkingHoursOfMonth: PropTypes.func.isRequired,
   clrReportData: PropTypes.func.isRequired,
 };
 
@@ -148,5 +163,6 @@ const mapStateToProps = (state) => ({
 
 export default connect(mapStateToProps, {
   getRemainingWorkingHours: getReportOfRemainingWorkingHoursRequest,
+  getRemainingWorkingHoursOfMonth: getReportOfRemainingWorkingHoursOfMonthByDaysRequest,
   clrReportData: clearReportData,
 })(DashboardPage);

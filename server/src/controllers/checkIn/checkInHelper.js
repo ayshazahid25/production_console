@@ -271,7 +271,6 @@ const getAllCheckInsByUserIdAndMonthGroupByDaysMiddleware = async (
     $eq: id,
   };
 
-  console.log("condition:::::", condition);
   return CheckIns.aggregate([
     {
       $match: condition,

@@ -21,8 +21,24 @@ export const getReportOfRemainingWorkingHoursRequest = () => ({
 });
 
 // successfully fetched user's working time and remaing time
-export const getReportOfRemainingWorkingHoursRequestSuccess = ({ report }) => ({
+export const getReportOfRemainingWorkingHoursSuccess = ({ report }) => ({
   type: types.GET_REPORT_OF_REMAINING_WORKING_HOURS_SUCCESS,
+  payload: {
+    report,
+  },
+});
+
+// send the request to get user's working time and over time of specific month group by days
+export const getReportOfRemainingWorkingHoursOfMonthByDaysRequest = (data) => ({
+  type: types.GET_REPORT_OF_REMAINING_WORKING_HOURS_OF_MONTH_BY_DAYS_REQUEST,
+  payload: {
+    data,
+  },
+});
+
+// successfully fetched user's working time and over time of specific month group by days
+export const getReportOfRemainingWorkingHoursOfMonthByDaysSuccess = ({ report }) => ({
+  type: types.GET_REPORT_OF_REMAINING_WORKING_HOURS_OF_MONTH_BY_DAYS_SUCCESS,
   payload: {
     report,
   },

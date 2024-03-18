@@ -130,7 +130,7 @@ function* getReportOfRemainingWorkingHours() {
     const result = yield call(api.getReportOfRemainingWorkingHours);
 
     yield put(
-      actions.getReportOfRemainingWorkingHoursRequestSuccess({
+      actions.getReportOfRemainingWorkingHoursSuccess({
         report: result.data,
       })
     );
@@ -171,10 +171,48 @@ function* watchGetReportOfRemainingWorkingHoursRequest() {
   );
 }
 
+// ********** GET REPORT OF REMAINING WORKING HOURS OF MONTH GROUP BY DAYS **********
+function* getReportOfRemainingWorkingHoursOfMonthByDays({ payload }) {
+  try {
+    const result = yield call(api.getReportOfRemainingWorkingHoursOfMonthByDays, payload.data);
+
+    yield put(
+      actions.getReportOfRemainingWorkingHoursOfMonthByDaysSuccess({
+        report: result.data.monthlyReport,
+      })
+    );
+  } catch (e) {
+    if (e.message === 'Error: Not authorized, no token') {
+      setSession(null);
+      yield put(authActions.logoutRequest());
+
+      yield put(
+        authActions.loginError({
+          error: e.message,
+        })
+      );
+    } else {
+      yield put(
+        actions.reportError({
+          error: e.message,
+        })
+      );
+    }
+  }
+}
+
+function* watchGetReportOfRemainingWorkingHoursOfMonthByDaysRequest() {
+  yield takeEvery(
+    types.GET_REPORT_OF_REMAINING_WORKING_HOURS_OF_MONTH_BY_DAYS_REQUEST,
+    getReportOfRemainingWorkingHoursOfMonthByDays
+  );
+}
+
 const reportSagas = [
   fork(watchGetAdminDashboardRequest),
   fork(watchRecordCheckInsRequest),
   fork(watchGetReportOfRemainingWorkingHoursRequest),
+  fork(watchGetReportOfRemainingWorkingHoursOfMonthByDaysRequest),
 ];
 
 export default reportSagas;

@@ -1,14 +1,12 @@
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import * as Yup from 'yup';
+
 import { useEffect, useMemo, useState } from 'react';
 // form
 import { useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import useMediaQuery from '@mui/material/useMediaQuery';
 import {
-  IconButton,
   Button,
   Dialog,
   DialogTitle,
@@ -18,9 +16,8 @@ import {
   useTheme,
 } from '@mui/material';
 import { useSnackbar } from '../../../components/snackbar';
-import FormProvider, { RHFTextField } from '../../../components/hook-form';
+import FormProvider from '../../../components/hook-form';
 import Iconify from '../../../components/iconify';
-import { useSettingsContext } from '../../../components/settings';
 import PickerDateTime from '../../_examples/mui/pickers/PickerDateTime';
 import { recordCheckInRequest, clearMessage, clearError } from '../../../actions/report';
 // ----------------------------------------------------------------------

@@ -372,7 +372,7 @@ const reportOfWorkingHoursOfMonth = asyncHandler(async (req, res) => {
 });
 
 // @desc get report by month of each day
-// @route GET /api/check_in/report-month-each-day/
+// @route POST /api/check_in/report-month-each-day/
 // @access Private
 const reportOfWorkingHoursOfMonthByEachDay = asyncHandler(async (req, res) => {
   expressValidatorError(req);
@@ -383,7 +383,7 @@ const reportOfWorkingHoursOfMonthByEachDay = asyncHandler(async (req, res) => {
       req.result._id,
       req.body.specificMonth
     );
-    console.log("checkIns::", checkIns);
+
     if (!checkIns) {
       res.status(400);
       throw new Error("Unable to find any check-in/check-out!");
