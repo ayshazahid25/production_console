@@ -5,6 +5,7 @@ import * as api from '../api/report';
 import * as authApi from '../api/auth';
 import * as types from '../actions';
 import { setSession } from '../auth/utils';
+import formatDate from '../utils/formateMonthAndYear';
 
 // ********** GET ADMIN DAHSBOARD REPORT **********
 function* getAdminDashoard() {
@@ -83,8 +84,17 @@ function* recordCheckIns({ payload }) {
       // isAuthenticated: true,
     );
 
-    // Call getReportOfRemainingWorkingHours after recording check-in/check-out
+    // Call getReportOfRemainingWorkingHours and getReportOfRemainingWorkingHoursOfMonthByDays after recording check-in/check-out
     yield call(getReportOfRemainingWorkingHours);
+
+    const formattedDate = formatDate(new Date());
+
+    yield put(
+      actions.getReportOfRemainingWorkingHoursOfMonthByDaysRequest({
+        specificMonth: formattedDate,
+      })
+    );
+
     yield put(
       actions.setLoading({
         loading: false,
