@@ -27,6 +27,14 @@ const generateToken = (user) => {
   );
 };
 
+const customException = (message, statusCode) => {
+  console.log("message::", message);
+  const error = new Error(message);
+
+  error.statusCode = statusCode;
+  return error;
+};
+
 //encrtpt password
 const encryptPassword = async (password) => {
   const salt = await bcrypt.genSalt(10);
@@ -96,6 +104,7 @@ const startAndEndOfWeek = () => {
 module.exports = {
   expressValidatorError,
   generateToken,
+  customException,
   encryptPassword,
   convertMsToTime,
   convertStringTimeToDateTime,

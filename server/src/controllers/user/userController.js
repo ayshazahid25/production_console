@@ -13,6 +13,7 @@ const {
   userUpdation,
   getActiveUsersMiddleware,
   findUserById,
+  userIdsToDelete,
 } = require("./userHelper");
 const {
   validateUpdateUser,
@@ -263,8 +264,7 @@ const updateUser = asyncHandler(async (req, res) => {
 
   //validate param data
   expressValidatorError(req);
-
-  const userDetail = req.body;
+  const userDetail = JSON.parse(req.body);
 
   userDetail.updated_by = req.result._id.toString();
 
@@ -331,21 +331,32 @@ const freezeBulkUser = asyncHandler(async (req, res) => {
 
   try {
     // check if user exist with param id
-    const findUser = await findUserById(req.params.id);
+    const usersExistsByIds = await findUserById(req.body.userIds);
 
-    if (!findUser) {
+    if (usersExistsByIds.length === 0) {
       res.status(400);
-      throw new Error("User don't exist");
+      throw new Error("No User Exists");
     }
+
+    const userIds = userIdsToDelete(usersExistsByIds, req.result.id);
 
     //now update user
-    const userUpdated = await userUpdation(req.params.id, userDetail);
-    if (!userUpdated) {
+    const userUpdated = await userUpdation(userIds, userDetail);
+
+    if (!userUpdated || userUpdated[0] === 0) {
       res.status(400);
-      throw new Error("User could not be updated.");
+      throw new Error(
+        `Something went wrong! ${
+          userIds.length === 1 ? "User" : "Users"
+        } could not be updated.`
+      );
     }
 
-    return res.status(200).json({ message: "User updated successfully!" });
+    return res.status(200).json({
+      message: `${
+        userIds.length === 1 ? "User" : "Users"
+      } updated successfully!`,
+    });
   } catch (error) {
     res.status(
       error.statusCode
@@ -357,7 +368,9 @@ const freezeBulkUser = asyncHandler(async (req, res) => {
     throw new Error(
       `${
         error.statusCode !== 400 && res.statusCode !== 400
-          ? `Something went wrong during user updation: `
+          ? `Something went wrong during ${
+              req.body.userIds.length === 1 ? "user" : "users"
+            } updation: `
           : ""
       }${error.message}`
     );

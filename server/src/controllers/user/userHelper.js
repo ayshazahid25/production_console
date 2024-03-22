@@ -1,3 +1,5 @@
+const { titleCase } = require("title-case");
+const { customException } = require("../../middleware/commonMiddleware");
 const { Users } = require("../../models/user");
 const { ObjectId } = require("mongoose").Types;
 
@@ -332,8 +334,8 @@ const getUserByIdWithDetailMiddleware = async (userId) => {
 };
 
 // find user by id
-const findUserById = async (id) => {
-  return Users.findById({ _id: id })
+const findUserById = async (arrayOfIds) => {
+  return Users.find({ _id: { $in: arrayOfIds } })
     .then((result) => {
       return result;
     })
@@ -342,12 +344,39 @@ const findUserById = async (id) => {
     });
 };
 
+//get array of users to change status
+const userIdsToDelete = (usersExistsByIds, id) => {
+  const userIds = [];
+  usersExistsByIds.map((user) => {
+    if (user.is_admin || user.id === id) {
+      throw customException(
+        `${
+          usersExistsByIds.length > 1
+            ? `You are not allowed to perform this action. Please de-select "${titleCase(
+                user.first_name
+              )} ${titleCase(user.last_name)}" and try again.`
+            : `You are not allowed to perform this action on "${titleCase(
+                user.first_name
+              )} ${titleCase(user.last_name)}".`
+        }`,
+        400
+      );
+    }
+    userIds.push(user.id);
+  });
+  return userIds;
+};
+
 // find and update user
-const userUpdation = async (id, userData) => {
-  return Users.findOneAndUpdate({ _id: id }, userData, {
-    runValidators: true,
-    context: "query",
-  })
+const userUpdation = async (objectIds, userDetail) => {
+  return Users.updateMany(
+    { _id: { $in: objectIds } },
+    { $set: userDetail },
+    {
+      runValidators: true,
+      context: "query",
+    }
+  )
     .then((result) => {
       return result;
     })
@@ -370,6 +399,7 @@ module.exports = {
   getActiveUsersMiddleware,
   getUserByIdWithDetailMiddleware,
   findUserById,
+  userIdsToDelete,
   userUpdation,
   countActiveEmployees,
 };

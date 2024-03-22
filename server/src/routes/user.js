@@ -140,11 +140,21 @@ route.post(
 
 //freeze user
 route.post(
-  `/freeze/:id`,
+  `/bulk/freeze`,
   [
-    param("id").isMongoId().withMessage("Please enter a valid user id"),
-    body("is_active").isBoolean(),
+    body("is_active")
+      .isBoolean()
+      .withMessage("Please enter a valid active value"),
+    body("userIds")
+      .isArray({ min: 1 })
+      .withMessage("Please enter a valid user id"),
+    body("userIds.*")
+      .not()
+      .isArray()
+      .isMongoId()
+      .withMessage("Please enter valid user ids"), // Here lies the "magic" :)
   ],
+
   protect,
   freezeBulkUser
 );
