@@ -27,6 +27,6 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, 'user'),
     list: path(ROOTS_DASHBOARD, 'user/list'),
     new: path(ROOTS_DASHBOARD, 'user/new'),
-    details: (id) => path(ROOTS_DASHBOARD, `user/details/${id}`),
+    account: (id) => path(ROOTS_DASHBOARD, `user/account/${id}`),
   },
 };

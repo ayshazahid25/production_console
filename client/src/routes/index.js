@@ -18,6 +18,7 @@ import {
   CarListPage,
   UserCreatePage,
   UserListPage,
+  UserAccountPage,
 } from './elements';
 
 // ----------------------------------------------------------------------
@@ -88,10 +89,10 @@ export default function Router() {
               ),
             },
             {
-              path: 'details/:id',
+              path: 'account/:id',
               element: (
                 <RoleGuard permission="userplace_create_view_and_edit">
-                  <UserCreatePage />
+                  <UserAccountPage />
                 </RoleGuard>
               ),
             },

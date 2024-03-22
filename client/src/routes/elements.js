@@ -25,5 +25,6 @@ export const CarListPage = Loadable(lazy(() => import('../pages/car/CarListPage'
 export const UserListPage = Loadable(lazy(() => import('../pages/dashboard/UserListPage')));
 
 export const UserCreatePage = Loadable(lazy(() => import('../pages/dashboard/UserCreatePage')));
+export const UserAccountPage = Loadable(lazy(() => import('../pages/dashboard/UserAccountPage')));
 
 export const Page404 = Loadable(lazy(() => import('../pages/Page404')));
