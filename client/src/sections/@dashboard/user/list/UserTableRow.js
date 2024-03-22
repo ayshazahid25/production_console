@@ -13,6 +13,7 @@ import {
   Typography,
 } from '@mui/material';
 import moment from 'moment';
+import { useNavigate } from 'react-router-dom';
 // components
 import Label from '../../../../components/label';
 import Iconify from '../../../../components/iconify';
@@ -33,6 +34,7 @@ function UserTableRow({
   onDeleteRow,
   onActiveRow,
 }) {
+  const navigate = useNavigate();
   useEffect(() => {
     if (message) {
       handleCloseConfirm();
@@ -41,17 +43,7 @@ function UserTableRow({
     // eslint-disable-next-line
   }, [message]);
 
-  const {
-    // id,
-    full_name,
-    email,
-    phone_number,
-    email_verified,
-    status,
-    profileImage,
-    //  added_by_user,
-    joined_at,
-  } = row;
+  const { title, first_name, last_name, email, contract_durations, is_active, phone_number } = row;
 
   const [openConfirm, setOpenConfirm] = useState(false);
   const [openActiveConfirm, setOpenActiveConfirm] = useState(false);
@@ -85,33 +77,25 @@ function UserTableRow({
   return (
     <>
       <TableRow hover selected={selected}>
-        {user && user.permission_settings.user_create_view_and_edit && (
+        {user && user.is_admin && (
           <TableCell padding="checkbox">
             <Checkbox checked={selected} onClick={onSelectRow} />
           </TableCell>
         )}
         <TableCell>
           <Stack direction="row" alignItems="center" spacing={2}>
-            {/* <Avatar alt={first_name} src={avatarUrl} /> */}
-            {/* <Avatar sx={{ textTransform: 'capitalize' }} alt={full_name} src="/broken-image.jpg" /> */}
-
-            <CustomAvatar
-              src={profileImage}
-              alt={full_name}
-              name={full_name}
-              variant="rounded"
-              sx={{
-                width: 36,
-                height: 36,
-              }}
-            />
-
             <Typography variant="subtitle2" noWrap sx={{ textTransform: 'capitalize' }}>
-              {full_name}
-              {user && user.permission_settings.user_view_and_edit && (
+              {title}
+            </Typography>
+          </Stack>
+        </TableCell>
+        <TableCell>
+          <Stack direction="row" alignItems="center" spacing={2}>
+            <Typography variant="subtitle2" noWrap sx={{ textTransform: 'capitalize' }}>
+              {first_name} {last_name}
+              {user && user.is_admin && (
                 <IconButton
                   sx={{ padding: '0px 0px 3px 3px' }}
-                  // color="primary"
                   onClick={() => {
                     onEditRow();
                     handleClosePopover();
@@ -126,48 +110,47 @@ function UserTableRow({
 
         <TableCell align="left">{email}</TableCell>
         <TableCell align="left">{phone_number}</TableCell>
-        <TableCell align="left">{moment(joined_at).format('YYYY-MM-DD')}</TableCell>
-
-        {/* <TableCell align="left" sx={{ textTransform: 'capitalize' }}>
-          {role}
-        </TableCell> */}
-
+        <TableCell align="left">
+          {moment(contract_durations[0].start_date).format('YYYY-MM-DD')}
+        </TableCell>
+        {/* show employment_type */}
         <TableCell align="center">
-          <Iconify
-            icon={email_verified ? 'eva:checkmark-circle-fill' : 'eva:clock-outline'}
-            sx={{
-              width: 20,
-              height: 20,
-              color: 'success.main',
-              ...(!email_verified && { color: 'warning.main' }),
-            }}
-          />
+          <Label
+            variant="soft"
+            color={
+              contract_durations[contract_durations.length - 1].employment_type === 'permanent'
+                ? 'info'
+                : contract_durations[contract_durations.length - 1].employment_type === 'probation'
+                ? 'warning'
+                : contract_durations[contract_durations.length - 1].employment_type === 'internship'
+                ? 'primary'
+                : contract_durations[contract_durations.length - 1].employment_type === 'contract'
+                ? 'secondary'
+                : 'default'
+            }
+            sx={{ textTransform: 'capitalize' }}
+          >
+            {contract_durations[contract_durations.length - 1].employment_type}
+          </Label>
         </TableCell>
 
-        <TableCell align="left">
+        <TableCell align="center">
           <Label
             variant="soft"
             color={
               // eslint-disable-next-line no-nested-ternary
-              status === 'active' ? 'success' : status === 'banned' ? 'error' : 'warning'
+              is_active ? 'success' : 'error'
             }
             sx={{ textTransform: 'capitalize' }}
           >
             {
               // eslint-disable-next-line no-nested-ternary
-              status === 'active' ? 'Active' : status === 'banned' ? 'Banned' : 'Leave'
+              is_active ? 'Active' : 'Banned'
             }
           </Label>
         </TableCell>
 
-        {/* <TableCell sx={{ textTransform: 'capitalize' }} align="left">
-          {
-             ? 
-        //  
-            //  .full_name : 
-            ''}
-        </TableCell> */}
-        {user && user.permission_settings.user_view_and_edit && (
+        {user && user.is_admin && (
           <TableCell align="right">
             <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
               <Iconify icon="eva:more-vertical-fill" />
@@ -192,21 +175,20 @@ function UserTableRow({
           <Iconify icon="material-symbols:edit-square-outline" />
           Edit
         </MenuItem>
-        {user && user.permission_settings.user_create_view_and_edit && (
+        {user && user.is_admin && (
           <MenuItem
-            disabled={status === 'leave'}
             onClick={() => {
-              if (status === 'banned') {
+              if (!is_active) {
                 handleOpenActiveConfirm();
-              } else if (status === 'active') {
+              } else {
                 handleOpenConfirm();
               }
               handleClosePopover();
             }}
-            sx={{ color: (status === 'active' && 'error.main') || 'primary.main' }}
+            sx={{ color: (is_active && 'error.main') || 'primary.main' }}
           >
             <Iconify icon="mdi:person-block-outline" />
-            {(status === 'active' && 'Banned') || 'Active'}
+            {(is_active && 'Banned') || 'Active'}
           </MenuItem>
         )}
       </MenuPopover>

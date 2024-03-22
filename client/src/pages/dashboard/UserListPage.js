@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
-import { useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
 // @mui
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   Tab,
   Tabs,
@@ -16,10 +18,7 @@ import {
   IconButton,
   TableContainer,
 } from '@mui/material';
-// routes
-import { PATH_DASHBOARD } from '../../routes/paths';
-// _mock_
-import { _userList } from '../../_mock/arrays';
+
 // components
 import Iconify from '../../components/iconify';
 import Scrollbar from '../../components/scrollbar';
@@ -36,39 +35,87 @@ import {
   TableSelectedAction,
   TablePaginationCustom,
 } from '../../components/table';
+import { useSnackbar } from '../../components/snackbar';
 // sections
 import { UserTableToolbar, UserTableRow } from '../../sections/@dashboard/user/list';
+
+// Action
+import {
+  getAllUsersRequest,
+  getUserByIdRequest,
+  deleteUserRequest,
+  clearUserList,
+} from '../../actions/user';
+// routes
+import { PATH_AUTH, PATH_DASHBOARD } from '../../routes/paths';
 
 // ----------------------------------------------------------------------
 
 const STATUS_OPTIONS = ['all', 'active', 'banned'];
 
-const ROLE_OPTIONS = [
-  'all',
-  'ux designer',
-  'full stack designer',
-  'backend developer',
-  'project manager',
-  'leader',
-  'ui designer',
-  'ui/ux designer',
-  'front end developer',
-  'full stack developer',
-];
-
 const TABLE_HEAD = [
   { id: 'title', label: 'Title', align: 'left' },
-  { id: 'fullname', label: 'Full Name', align: 'left' },
+  { id: 'full_name', label: 'Name', align: 'left' },
   { id: 'email', label: 'Email', align: 'left' },
-  { id: 'employee type', label: 'Employee Type', align: 'left' },
-  // { id: 'isVerified', label: 'Verified', align: 'center' },
+  { id: 'phone_number', label: 'Phone Number', align: 'left' },
+  { id: 'joined_at', label: 'Joining Date', align: 'left' },
+  { id: 'employment_type', label: 'Employment Type', align: 'left' },
   { id: 'status', label: 'Status', align: 'left' },
   { id: '' },
 ];
 
 // ----------------------------------------------------------------------
 
-export default function UserListPage() {
+function UserListPage({
+  Users: { users, error, message },
+  Auth: { isAuthenticated, user },
+  // eslint-disable-next-line
+  getAllUsersRequest,
+  // eslint-disable-next-line
+  getUserByIdRequest,
+  // eslint-disable-next-line
+  deleteUserRequest,
+  // eslint-disable-next-line
+  clearUserList,
+}) {
+  const [tableData, setTableData] = useState([]);
+  const { enqueueSnackbar } = useSnackbar();
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate(PATH_AUTH.login, { replace: true });
+    }
+
+    if (users == null) {
+      getAllUsersRequest();
+    } else {
+      setTableData(users);
+    }
+
+    // eslint-disable-next-line
+  }, [
+    isAuthenticated,
+    users,
+    //  error
+  ]);
+
+  useEffect(
+    () => () => clearUserList(),
+    // eslint-disable-next-line
+    []
+  );
+
+  useEffect(() => {
+    if (message) {
+      enqueueSnackbar(message);
+    }
+    if (error) {
+      enqueueSnackbar(error, { variant: 'error' });
+    }
+
+    // eslint-disable-next-line
+  }, [message, error]);
+
   const {
     dense,
     page,
@@ -92,34 +139,27 @@ export default function UserListPage() {
 
   const navigate = useNavigate();
 
-  const [tableData, setTableData] = useState(_userList);
-
   const [openConfirm, setOpenConfirm] = useState(false);
+  const [activeOpenConfirm, setActiveOpenConfirm] = useState(false);
 
   const [filterName, setFilterName] = useState('');
 
-  const [filterRole, setFilterRole] = useState('all');
-
-  const [filterStatus, setFilterStatus] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('active');
 
   const dataFiltered = applyFilter({
     inputData: tableData,
     comparator: getComparator(order, orderBy),
     filterName,
-    filterRole,
     filterStatus,
   });
 
   const dataInPage = dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
   const denseHeight = dense ? 52 : 72;
 
-  const isFiltered = filterName !== '' || filterRole !== 'all' || filterStatus !== 'all';
+  const isFiltered = filterName !== '';
 
   const isNotFound =
-    (!dataFiltered.length && !!filterName) ||
-    (!dataFiltered.length && !!filterRole) ||
-    (!dataFiltered.length && !!filterStatus);
+    (!dataFiltered.length && !!filterName) || (!dataFiltered.length && !!filterStatus);
 
   const handleOpenConfirm = () => {
     setOpenConfirm(true);
@@ -127,6 +167,14 @@ export default function UserListPage() {
 
   const handleCloseConfirm = () => {
     setOpenConfirm(false);
+  };
+
+  const handleActiveOpenConfirm = () => {
+    setActiveOpenConfirm(true);
+  };
+
+  const handleActiveCloseConfirm = () => {
+    setActiveOpenConfirm(false);
   };
 
   const handleFilterStatus = (event, newValue) => {
@@ -139,15 +187,9 @@ export default function UserListPage() {
     setFilterName(event.target.value);
   };
 
-  const handleFilterRole = (event) => {
-    setPage(0);
-    setFilterRole(event.target.value);
-  };
-
-  const handleDeleteRow = (id) => {
-    const deleteRow = tableData.filter((row) => row.id !== id);
+  const handleDeleteRow = (id, payload) => {
+    deleteUserRequest({ userId: [id], is_active: payload.status });
     setSelected([]);
-    setTableData(deleteRow);
 
     if (page > 0) {
       if (dataInPage.length < 2) {
@@ -156,10 +198,9 @@ export default function UserListPage() {
     }
   };
 
-  const handleDeleteRows = (selectedRows) => {
-    const deleteRows = tableData.filter((row) => !selectedRows.includes(row.id));
+  const handleDeleteRows = (selectedRows, payload) => {
+    deleteUserRequest({ userId: selectedRows, is_active: payload.status });
     setSelected([]);
-    setTableData(deleteRows);
 
     if (page > 0) {
       if (selectedRows.length === dataInPage.length) {
@@ -173,39 +214,38 @@ export default function UserListPage() {
     }
   };
 
-  const handleEditRow = (id) => {
-    navigate(PATH_DASHBOARD.user.edit(paramCase(id)));
+  const handleEditRow = (userId) => {
+    getUserByIdRequest(userId);
+    navigate(PATH_DASHBOARD.user.account(userId));
   };
-
   const handleResetFilter = () => {
     setFilterName('');
-    setFilterRole('all');
-    setFilterStatus('all');
+
+    setFilterStatus('active');
   };
 
   return (
     <>
       <Helmet>
-        <title> User: List | Minimal UI</title>
+        <title> User: List | Buggaz Ltd</title>
       </Helmet>
 
       <Container maxWidth={themeStretch ? false : 'lg'}>
         <CustomBreadcrumbs
           heading="User List"
-          links={[
-            { name: 'Dashboard', href: PATH_DASHBOARD.root },
-            { name: 'User', href: PATH_DASHBOARD.user.root },
-            { name: 'List' },
-          ]}
+          links={[{ name: 'Dashboard', href: PATH_DASHBOARD.root }, { name: 'Users' }]}
           action={
-            <Button
-              component={RouterLink}
-              to={PATH_DASHBOARD.user.new}
-              variant="contained"
-              startIcon={<Iconify icon="eva:plus-fill" />}
-            >
-              New User
-            </Button>
+            user &&
+            user.is_admin && (
+              <Button
+                component={RouterLink}
+                to={PATH_DASHBOARD.user.new}
+                variant="contained"
+                startIcon={<Iconify icon="eva:plus-fill" />}
+              >
+                New User
+              </Button>
+            )
           }
         />
 
@@ -228,35 +268,42 @@ export default function UserListPage() {
           <UserTableToolbar
             isFiltered={isFiltered}
             filterName={filterName}
-            filterRole={filterRole}
-            optionsRole={ROLE_OPTIONS}
             onFilterName={handleFilterName}
-            onFilterRole={handleFilterRole}
             onResetFilter={handleResetFilter}
           />
 
           <TableContainer sx={{ position: 'relative', overflow: 'unset' }}>
-            <TableSelectedAction
-              dense={dense}
-              numSelected={selected.length}
-              rowCount={tableData.length}
-              onSelectAllRows={(checked) =>
-                onSelectAllRows(
-                  checked,
-                  tableData.map((row) => row.id)
-                )
-              }
-              action={
-                <Tooltip title="Delete">
-                  <IconButton color="primary" onClick={handleOpenConfirm}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
-                </Tooltip>
-              }
-            />
+            {user && user.is_admin && (
+              <TableSelectedAction
+                dense={dense}
+                numSelected={selected.length}
+                rowCount={tableData.length}
+                onSelectAllRows={(checked) =>
+                  onSelectAllRows(
+                    checked,
+                    tableData.map((row) => row._id)
+                  )
+                }
+                action={
+                  <>
+                    <Tooltip title="Active">
+                      <IconButton color="primary" onClick={handleActiveOpenConfirm}>
+                        <Iconify icon="mdi:account-check-outline" />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title="Banned">
+                      <IconButton color="error" onClick={handleOpenConfirm}>
+                        <Iconify icon="mdi:person-block-outline" />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                }
+              />
+            )}
             <Scrollbar>
               <Table size={dense ? 'small' : 'medium'} sx={{ minWidth: 800 }}>
                 <TableHeadCustom
+                  viewEdit={user.is_admin}
                   order={order}
                   orderBy={orderBy}
                   headLabel={TABLE_HEAD}
@@ -266,7 +313,7 @@ export default function UserListPage() {
                   onSelectAllRows={(checked) =>
                     onSelectAllRows(
                       checked,
-                      tableData.map((row) => row.id)
+                      tableData.map((row) => row._id)
                     )
                   }
                 />
@@ -276,12 +323,14 @@ export default function UserListPage() {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map((row) => (
                       <UserTableRow
-                        key={row.id}
+                        user={user}
+                        key={row._id}
                         row={row}
-                        selected={selected.includes(row.id)}
-                        onSelectRow={() => onSelectRow(row.id)}
-                        onDeleteRow={() => handleDeleteRow(row.id)}
-                        onEditRow={() => handleEditRow(row.name)}
+                        selected={selected.includes(row._id)}
+                        onSelectRow={() => onSelectRow(row._id)}
+                        onDeleteRow={() => handleDeleteRow(row.id, { status: false })}
+                        onActiveRow={() => handleDeleteRow(row.id, { status: true })}
+                        onEditRow={() => handleEditRow(row._id)}
                       />
                     ))}
 
@@ -299,10 +348,10 @@ export default function UserListPage() {
           <TablePaginationCustom
             count={dataFiltered.length}
             page={page}
+            rowsPerPageOptions={[25, 50, 100]}
             rowsPerPage={rowsPerPage}
             onPageChange={onChangePage}
             onRowsPerPageChange={onChangeRowsPerPage}
-            //
             dense={dense}
             onChangeDense={onChangeDense}
           />
@@ -312,10 +361,10 @@ export default function UserListPage() {
       <ConfirmDialog
         open={openConfirm}
         onClose={handleCloseConfirm}
-        title="Delete"
+        title="Banned"
         content={
           <>
-            Are you sure want to delete <strong> {selected.length} </strong> items?
+            Are you sure want to banned <strong> {selected.length} </strong> user?
           </>
         }
         action={
@@ -323,11 +372,33 @@ export default function UserListPage() {
             variant="contained"
             color="error"
             onClick={() => {
-              handleDeleteRows(selected);
+              handleDeleteRows(selected, { status: false });
               handleCloseConfirm();
             }}
           >
-            Delete
+            Banned
+          </Button>
+        }
+      />
+      <ConfirmDialog
+        open={activeOpenConfirm}
+        onClose={handleActiveCloseConfirm}
+        title="Active"
+        content={
+          <>
+            Are you sure want to active <strong> {selected.length} </strong> user?
+          </>
+        }
+        action={
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              handleDeleteRows(selected, { status: true });
+              handleActiveCloseConfirm();
+            }}
+          >
+            Active
           </Button>
         }
       />
@@ -335,31 +406,49 @@ export default function UserListPage() {
   );
 }
 
+UserListPage.propTypes = {
+  Users: PropTypes.object.isRequired,
+  Auth: PropTypes.object.isRequired,
+  getAllUsersRequest: PropTypes.func.isRequired,
+  getUserByIdRequest: PropTypes.func.isRequired,
+  deleteUserRequest: PropTypes.func.isRequired,
+  clearUserList: PropTypes.func.isRequired,
+};
+
+const mapStateToProps = (state) => ({
+  Users: state.Users,
+  Auth: state.Auth,
+});
+
+export default connect(mapStateToProps, {
+  getAllUsersRequest,
+  getUserByIdRequest,
+  deleteUserRequest,
+  clearUserList,
+})(UserListPage);
 // ----------------------------------------------------------------------
 
-function applyFilter({ inputData, comparator, filterName, filterStatus, filterRole }) {
-  const stabilizedThis = inputData.map((el, index) => [el, index]);
+function applyFilter({ inputData, comparator, filterName, filterStatus }) {
+  const status = filterStatus;
 
+  const stabilizedThis = inputData.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
-    if (order !== 0) return order;
+    if (order !== 0) {
+      return order;
+    }
     return a[1] - b[1];
   });
 
   inputData = stabilizedThis.map((el) => el[0]);
-
   if (filterName) {
     inputData = inputData.filter(
-      (user) => user.name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
+      (user) => user.first_name.toLowerCase().indexOf(filterName.toLowerCase()) !== -1
     );
   }
 
   if (filterStatus !== 'all') {
-    inputData = inputData.filter((user) => user.status === filterStatus);
-  }
-
-  if (filterRole !== 'all') {
-    inputData = inputData.filter((user) => user.role === filterRole);
+    inputData = inputData.filter((user) => (user.is_active ? 'active' : 'banned') === status);
   }
 
   return inputData;
