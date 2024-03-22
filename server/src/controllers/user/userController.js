@@ -14,6 +14,7 @@ const {
   getActiveUsersMiddleware,
   findUserById,
   userIdsToDelete,
+  usersUpdation,
 } = require("./userHelper");
 const {
   validateUpdateUser,
@@ -264,7 +265,8 @@ const updateUser = asyncHandler(async (req, res) => {
 
   //validate param data
   expressValidatorError(req);
-  const userDetail = JSON.parse(req.body);
+
+  const userDetail = req.body;
 
   userDetail.updated_by = req.result._id.toString();
 
@@ -341,7 +343,7 @@ const freezeBulkUser = asyncHandler(async (req, res) => {
     const userIds = userIdsToDelete(usersExistsByIds, req.result.id);
 
     //now update user
-    const userUpdated = await userUpdation(userIds, userDetail);
+    const userUpdated = await usersUpdation(userIds, userDetail);
 
     if (!userUpdated || userUpdated[0] === 0) {
       res.status(400);

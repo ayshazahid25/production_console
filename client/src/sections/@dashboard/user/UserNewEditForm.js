@@ -52,7 +52,6 @@ function UserNewEditForm({
   handleSubmited,
   handleData,
 }) {
-  console.log('currentUser::, ', currentUser);
   // const navigate = useNavigate();
 
   const NewUserSchema = !isEdit

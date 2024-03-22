@@ -368,7 +368,7 @@ const userIdsToDelete = (usersExistsByIds, id) => {
 };
 
 // find and update user
-const userUpdation = async (objectIds, userDetail) => {
+const usersUpdation = async (objectIds, userDetail) => {
   return Users.updateMany(
     { _id: { $in: objectIds } },
     { $set: userDetail },
@@ -377,6 +377,19 @@ const userUpdation = async (objectIds, userDetail) => {
       context: "query",
     }
   )
+    .then((result) => {
+      return result;
+    })
+    .catch((err) => {
+      throw new Error(err);
+    });
+};
+
+const userUpdation = async (id, userData) => {
+  return Users.findOneAndUpdate({ _id: id }, userData, {
+    runValidators: true,
+    context: "query",
+  })
     .then((result) => {
       return result;
     })
@@ -401,5 +414,6 @@ module.exports = {
   findUserById,
   userIdsToDelete,
   userUpdation,
+  usersUpdation,
   countActiveEmployees,
 };

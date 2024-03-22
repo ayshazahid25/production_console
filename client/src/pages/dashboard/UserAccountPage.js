@@ -47,7 +47,6 @@ function UserAccountPage({
   // eslint-disable-next-line
   clearError,
 }) {
-  console.log('user:', user);
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -92,7 +91,7 @@ function UserAccountPage({
 
   const submitUser = (data) => {
     setUserData(data);
-    updateUserRequest(user?.id, data);
+    updateUserRequest(user?._id, data);
   };
   //
   // const submitPermission = (permissionData) => {

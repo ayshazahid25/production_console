@@ -17,7 +17,7 @@ function* getAllUsers() {
     );
 
     const result = yield call(api.getAllUsers);
-    console.log('clrUsers:', result);
+
     yield put(
       actions.getAllUsersSuccess({
         users: result.data.users,
@@ -111,30 +111,15 @@ function* watchGetUserByIdRequest() {
 // ********** UPDATE USER DATA **********
 function* updateUser({ payload }) {
   try {
-    yield put(
-      actions.setLoading({
-        loading: true,
-      })
-    );
-    const userData = {
-      user: payload.user,
-    };
+    const userData = payload.user;
 
-    const formData = new FormData(JSON.stringify(userData));
+    const response = yield call(api.updateUser, { userId: payload.userId, userData });
 
-    const response = yield call(api.updateUser, { userId: payload.userId, formData });
-
-    console.log('response::', response);
     yield put(actions.getUserByIdRequest(payload.userId));
 
     yield put(
       actions.updateUserSuccess({
         message: response.data.message,
-      })
-    );
-    yield put(
-      actions.setLoading({
-        loading: false,
       })
     );
   } catch (e) {
@@ -149,11 +134,6 @@ function* updateUser({ payload }) {
       );
     } else {
       yield put(
-        actions.setLoading({
-          loading: false,
-        })
-      );
-      yield put(
         actions.userError({
           error: e.message || e,
         })
@@ -167,7 +147,6 @@ function* watchUpdateUserRequest() {
 }
 
 function* deleteUser({ userId, is_active, isEdit }) {
-  console.log('isEdit::, isEdit', isEdit);
   try {
     const response = yield call(api.deleteUser, { userId, is_active });
 

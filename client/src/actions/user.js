@@ -44,7 +44,6 @@ export const updateUserRequest = (userId, userData) => ({
       first_name: userData.first_name,
       last_name: userData.last_name,
       email: userData.email,
-      billing_rate: userData.billing_rate,
       phone_number: userData.phone_number,
       cnic: userData.CNIC,
       address: userData.address,
