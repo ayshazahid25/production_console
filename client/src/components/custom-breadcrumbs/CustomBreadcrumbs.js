@@ -25,7 +25,7 @@ function CustomBreadcrumbs({ links, action, heading, moreLink, activeLast, sx, .
         <Box sx={{ flexGrow: 1 }}>
           {/* HEADING */}
           {heading && (
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" gutterBottom sx={{ textTransform: 'capitalize' }}>
               {heading}
             </Typography>
           )}
