@@ -4,7 +4,7 @@ import { Card, CardHeader } from '@mui/material';
 
 // components
 import Chart, { useChart } from '../../../../components/chart';
-import PickerDate from '../../../_examples/mui/pickers/PickerDate';
+import PickerMonth from '../../../_examples/mui/pickers/PickerMonth';
 
 const StyledChart = styled('div')(({ theme }) => ({
   height: 400,
@@ -76,7 +76,7 @@ export default function MonthlyReportChart({ monthlyReport }) {
 
   return (
     <Card>
-      <CardHeader style={{ textAlign: 'center' }} title={<PickerDate />} />
+      <CardHeader style={{ textAlign: 'center' }} title={<PickerMonth />} />
 
       <StyledChart>
         <Chart type="bar" series={series} options={chartOptions} height={320} />
