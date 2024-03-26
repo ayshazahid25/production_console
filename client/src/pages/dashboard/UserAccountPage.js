@@ -23,11 +23,12 @@ import UserNewEditForm from '../../sections/@dashboard/user/UserNewEditForm';
 import {
   getUserByIdRequest,
   updateUserRequest,
-  // updatePermissionRequest,
+  updatePermissionRequest,
   clearUser,
   clearMessage,
   clearError,
 } from '../../actions/user';
+import UserContractHistory from '../../sections/@dashboard/user/UserContractHistory';
 
 // ----------------------------------------------------------------------
 
@@ -39,7 +40,7 @@ function UserAccountPage({
   // eslint-disable-next-line
   updateUserRequest,
   // eslint-disable-next-line
-  // updatePermissionRequest,
+  updatePermissionRequest,
   // eslint-disable-next-line
   clearUser,
   // eslint-disable-next-line
@@ -47,7 +48,6 @@ function UserAccountPage({
   // eslint-disable-next-line
   clearError,
 }) {
-  console.log('user:', user);
   const navigate = useNavigate();
 
   const location = useLocation();
@@ -95,10 +95,10 @@ function UserAccountPage({
     updateUserRequest(user?.id, data);
   };
   //
-  // const submitPermission = (permissionData) => {
-  //   setPermissionSettings(permissionData);
-  //   updatePermissionRequest(user?.id, permissionData);
-  // };
+  const submitPermission = (permissionData) => {
+    // setPermissionSettings(permissionData);
+    // updatePermissionRequest(user?.id, permissionData);
+  };
 
   const TABS = [
     {
@@ -111,8 +111,16 @@ function UserAccountPage({
     },
     {
       value: 'permissionSettings',
-      label: 'Permission Settings',
+      label: 'Contract History',
       icon: <Iconify icon="ic:round-receipt" />,
+      component: (
+        <UserContractHistory
+          // isEdit
+          // handleSubmited={submitPermission}
+          // currentPermission={permissionSettings || user?.permission_settings || null}
+          currentUser={user}
+        />
+      ),
       // component: (
       //   <UserPermissionSettings
       //     isEdit
@@ -169,7 +177,7 @@ UserAccountPage.propTypes = {
   Auth: PropTypes.object.isRequired,
   getUserByIdRequest: PropTypes.func.isRequired,
   updateUserRequest: PropTypes.func.isRequired,
-  // updatePermissionRequest: PropTypes.func.isRequired,
+  updatePermissionRequest: PropTypes.func.isRequired,
   clearUser: PropTypes.func.isRequired,
   clearMessage: PropTypes.func.isRequired,
   clearError: PropTypes.func.isRequired,
@@ -183,7 +191,7 @@ const mapStateToProps = (state) => ({
 export default connect(mapStateToProps, {
   getUserByIdRequest,
   updateUserRequest,
-  // updatePermissionRequest,
+  updatePermissionRequest,
   clearUser,
   clearMessage,
   clearError,
