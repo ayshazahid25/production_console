@@ -33,6 +33,21 @@ export const resetPasswordRequest = () => ({
   type: types.RESET_PASSWORD_REQUEST,
 });
 
+// ********** CREATE NEW USER **********
+export const createUserRequest = (userData) => ({
+  type: types.CREATE_USER_REQUEST,
+  payload: {
+    userData,
+  },
+});
+
+export const createUserSuccess = ({ message }) => ({
+  type: types.CREATE_USER_SUCCESS,
+  payload: {
+    message,
+  },
+});
+
 // ********** UPDATING **********
 export const updateUserRequest = (userId, userData) => ({
   type: types.UPDATE_USER_REQUEST,

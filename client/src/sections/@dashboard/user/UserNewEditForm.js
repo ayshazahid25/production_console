@@ -1,10 +1,10 @@
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import * as Yup from 'yup';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 // import { useNavigate } from 'react-router-dom';
 // form
-import { useForm, Controller, useFieldArray } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 // @mui
 import { LoadingButton } from '@mui/lab';
@@ -27,16 +27,12 @@ import {
   Divider,
 } from '@mui/material';
 import moment from 'moment';
-// utils
-import { fData } from '../../../utils/formatNumber';
-// routes
-// import { PATH_DASHBOARD } from '../../../routes/paths';
 
 // components
 import Iconify from '../../../components/iconify';
 import Label from '../../../components/label';
 
-import FormProvider, { RHFTextField, RHFUploadAvatar } from '../../../components/hook-form';
+import FormProvider, { RHFTextField } from '../../../components/hook-form';
 import ResetPasswordDialogs from '../../../components/user/ResetPasswordDialogs';
 
 import { deleteUserRequest } from '../../../actions/user';
@@ -52,8 +48,6 @@ function UserNewEditForm({
   handleSubmited,
   handleData,
 }) {
-  // const navigate = useNavigate();
-
   const NewUserSchema = !isEdit
     ? Yup.object().shape({
         title: Yup.string().required('Title is required'),
@@ -78,6 +72,12 @@ function UserNewEditForm({
             const pattern = /^(\d{13})$/;
             return pattern.test(value) || value === '';
           }),
+        employment_type: Yup.string()
+          .oneOf(['permanent', 'probation', 'internship', 'contract'], 'Invalid employment type')
+          .required('Employment type is required'),
+
+        start_date: Yup.date().required('Start Date is required'),
+        end_date: Yup.date().required('End Date is required'),
       })
     : Yup.object().shape({
         title: Yup.string().min(3).required('Title is required'),
@@ -115,6 +115,9 @@ function UserNewEditForm({
       phone_number: currentUser?.phone_number || '',
       address: currentUser?.address || '',
       CNIC: currentUser?.cnic || '',
+      employment_type: currentUser?.employment_type || 'probation', // Default value is probation
+      start_date: moment().format('YYYY-MM-DD'), // Default to today's date
+      end_date: moment().add(3, 'months').format('YYYY-MM-DD'), // Default to today's date + 3 months
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [currentUser]
@@ -126,7 +129,6 @@ function UserNewEditForm({
   });
 
   const {
-    // register,
     reset,
     control,
     setValue,
@@ -139,6 +141,7 @@ function UserNewEditForm({
   const [onActive, setOnActive] = useState(currentUser?.is_active ? 'active' : 'banned');
 
   const [isDisable, setIsDisable] = useState(false);
+  const [isDateDisabled, setIsDateDisabled] = useState(false);
 
   useEffect(() => {
     if (isEdit && currentUser) {
@@ -163,12 +166,18 @@ function UserNewEditForm({
         email: data.email ? data.email : null,
         phone_number: data.phone_number ? data.phone_number : null,
         address: data.address ? data.address : null,
-        CNIC: data.CNIC ? data.CNIC : null,
+        cnic: data.CNIC ? data.CNIC : null,
       };
 
       if (!isEdit) {
         userData.password = data.password;
+        userData.employment_type = data.employment_type;
+        userData.start_date = data.start_date.toISOString();
+        userData.end_date =
+          data.employment_type === 'permanent' ? null : data.end_date.toISOString();
+
         handleSubmited(userData);
+
         reset();
       } else {
         handleSubmited(userData);
@@ -200,6 +209,11 @@ function UserNewEditForm({
     setOpen(false);
   };
 
+  const handleEmploymentTypeChange = (newValue) => {
+    setValue('employment_type', newValue); // Set the value of employment type
+    setIsDateDisabled(newValue === 'permanent'); // Set isDateDisabled based on the new value of employment type
+  };
+
   const genderArray = [
     {
       value: 'male',
@@ -210,14 +224,32 @@ function UserNewEditForm({
       label: 'Female',
     },
   ];
+  const employetypeArray = [
+    {
+      value: 'permanent',
+      label: 'Permanent',
+    },
+    {
+      value: 'probation',
+      label: 'Probation',
+    },
+    {
+      value: 'internship',
+      label: 'Internship',
+    },
+    {
+      value: 'contract',
+      label: 'Contract',
+    },
+  ];
 
   return (
     <>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Grid container spacing={3}>
-          <Grid item xs={12} md={4}>
-            <Card sx={{ pt: 5, pb: 5, px: 3 }}>
-              {isEdit && !isBannable && (
+          {isEdit && !isBannable && (
+            <Grid item xs={12} md={4}>
+              <Card sx={{ pt: 5, pb: 5, px: 3 }}>
                 <FormControlLabel
                   labelPlacement="start"
                   control={
@@ -246,9 +278,6 @@ function UserNewEditForm({
                             }
                             sx={{
                               textTransform: 'uppercase',
-                              // position: 'absolute',
-                              // top: 24,
-                              // right: 24,
                             }}
                           >
                             {
@@ -270,19 +299,17 @@ function UserNewEditForm({
                   }
                   sx={{ mx: 0, mb: 3, width: 1, justifyContent: 'space-between' }}
                 />
-              )}
 
-              {isEdit && !isBannable && (
                 <Stack alignItems="center">
                   <Button variant="soft" onClick={handleClickOpen}>
                     Reset Password
                   </Button>
                 </Stack>
-              )}
-            </Card>
-          </Grid>
+              </Card>
+            </Grid>
+          )}
 
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={isEdit ? 8 : 12}>
             <Card sx={{ p: 3 }}>
               <Stack direction="row-reverse" alignItems="flex-end" sx={{ mb: 3 }}>
                 {isBannable && (
@@ -316,7 +343,7 @@ function UserNewEditForm({
                     label="Last Name *"
                   />
                 </Grid>
-                <Grid item xs={4} sm={isEdit ? 4 : 2}>
+                <Grid item xs={4} sm={4}>
                   <RHFTextField
                     // id="outlined-select-currency"
                     disabled={isBannable && !isDisable}
@@ -367,14 +394,14 @@ function UserNewEditForm({
                   </Grid>
                 )}
 
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={isEdit ? 6 : 4}>
                   <RHFTextField
                     name="CNIC"
                     disabled={isBannable && !isDisable}
                     label="CNIC Number"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={12} sm={isEdit ? 6 : 4}>
                   <RHFTextField
                     name="address"
                     disabled={isBannable && !isDisable}
@@ -383,64 +410,48 @@ function UserNewEditForm({
                 </Grid>
               </Grid>
 
-              {/* 
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <Controller
-                  name="joined_at"
-                  control={control}
-                  defaultValue={null}
-                  render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                    <DesktopDatePicker
-                      label="Joining Date *"
-                      disableFuture
-                      disabled={isBannable}
-                      value={value}
-                      onChange={(date) => onChange(moment(date).format('YYYY-MM-DD'))}
-                      renderInput={(params) => (
-                        <TextField
-                          error={invalid}
-                          helperText={invalid ? error.message : null}
-                          id="joined_at"
-                          margin="none"
-                          fullWidth
-                          color="primary"
-                          {...params}
-                        />
-                      )}
-                    />
+              <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={4}>
+                  {!isEdit && (
+                    <RHFTextField
+                      name="employment_type"
+                      label="Employment Type *"
+                      select
+                      variant="outlined"
+                      onChange={(e) => handleEmploymentTypeChange(e.target.value)}
+                    >
+                      {employetypeArray.map((option) => (
+                        <MenuItem key={option.value} value={option.value}>
+                          {option.label}
+                        </MenuItem>
+                      ))}
+                    </RHFTextField>
                   )}
-                />
-              </Grid>
-              {!isBannable && (
-                <Grid item xs={12} sm={6}>
-                  <Controller
-                    name="released_date"
-                    control={control}
-                    defaultValue={null}
-                    render={({ field: { onChange, value }, fieldState: { error, invalid } }) => (
-                      <DesktopDatePicker
-                        label="Released"
-                        disableFuture
-                        disabled={isBannable && !isDisable}
-                        value={value}
-                        onChange={(date) => onChange(moment(date).format('YYYY-MM-DD'))}
-                        renderInput={(params) => (
-                          <TextField
-                            error={invalid}
-                            helperText={invalid ? error.message : null}
-                            id="released_date"
-                            margin="none"
-                            fullWidth
-                            color="primary"
-                            {...params}
-                          />
-                        )}
-                      />
-                    )}
+                </Grid>
+
+                <Grid item xs={12} sm={4}>
+                  <DesktopDatePicker
+                    label="Start Date *"
+                    value={getValues('start_date')}
+                    onChange={(date) => setValue('start_date', date, { shouldValidate: true })}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    inputFormat="MM/dd/yyyy"
                   />
                 </Grid>
-              )} */}
+                <Grid item xs={12} sm={4}>
+                  <DesktopDatePicker
+                    label="End Date *"
+                    disabled={isDateDisabled} // Disable if employment type is permanent
+                    value={getValues('end_date')}
+                    minDate={getValues('start_date')}
+                    onChange={(date) => setValue('end_date', date, { shouldValidate: true })}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                    inputFormat="MM/dd/yyyy"
+                  />
+                </Grid>
+              </Grid>
+
               <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
 
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>

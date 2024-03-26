@@ -108,7 +108,43 @@ function* watchGetUserByIdRequest() {
   yield takeEvery(types.GET_USER_BY_ID_REQUEST, getUserById);
 }
 
-// ********** UPDATE USER DATA **********
+// ********** CREATE NEW USER **********
+function* createUser({ payload }) {
+  try {
+    const response = yield call(api.createUser, payload.userData);
+
+    yield put(
+      actions.createUserSuccess({
+        message: response.data.message,
+      })
+    );
+
+    // yield call(getUsers);
+  } catch (e) {
+    if (e.message === 'Error: Not authorized, no token') {
+      setSession(null);
+      yield put(authActions.logoutRequest());
+
+      yield put(
+        authActions.loginError({
+          error: e.message,
+        })
+      );
+    } else {
+      yield put(
+        actions.userError({
+          error: e.message || e,
+        })
+      );
+    }
+  }
+}
+
+function* watchCreateUserRequest() {
+  yield takeLatest(types.CREATE_USER_REQUEST, createUser);
+}
+
+// ********** UPDATE USER **********
 function* updateUser({ payload }) {
   try {
     const userData = payload.user;
@@ -351,6 +387,7 @@ function* watchDeleteUserRequest() {
 const userSagas = [
   fork(watchGetAllUsersRequest),
   fork(watchGetUserByIdRequest),
+  fork(watchCreateUserRequest),
   fork(watchUpdateUserRequest),
   fork(watchDeleteUserRequest),
 

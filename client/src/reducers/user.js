@@ -26,6 +26,13 @@ export default function user(state = INITIAL_STATE, action) {
         error: null,
       };
     }
+    case types.CREATE_USER_SUCCESS: {
+      return {
+        ...state,
+        message: action.payload.message,
+        error: null,
+      };
+    }
     case types.UPDATE_USER_SUCCESS: {
       return {
         ...state,

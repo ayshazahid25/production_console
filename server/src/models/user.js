@@ -55,12 +55,10 @@ const schemaUser = new mongoose.Schema(
     },
     phone_number: {
       type: String,
-      unique: true,
       sparse: true,
     },
     cnic: {
       type: String,
-      unique: true,
       index: true,
       sparse: true,
     },
@@ -109,6 +107,10 @@ const schemaUser = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Compound index to enforce uniqueness only when the field is not null
+schemaUser.index({ phone_number: 1, _id: 1 }, { unique: true, sparse: true });
+schemaUser.index({ cnic: 1, _id: 1 }, { unique: true, sparse: true });
 
 //joi validation
 function validateCreateUser(user) {
