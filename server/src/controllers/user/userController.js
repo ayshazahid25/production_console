@@ -15,6 +15,7 @@ const {
   findUserById,
   userIdsToDelete,
   usersUpdation,
+  getUserByUniqueValues,
 } = require("./userHelper");
 const {
   validateUpdateUser,
@@ -82,6 +83,7 @@ const createUser = asyncHandler(async (req, res) => {
         throw new Error(error.details[0].message);
       }
     }
+
     const userData = _.pick(req.body, [
       "email",
       "is_admin",
@@ -94,6 +96,16 @@ const createUser = asyncHandler(async (req, res) => {
       "address",
       "added_by",
     ]);
+
+    //check if user exist
+    const userExists = await getUserByUniqueValues(userData, null);
+
+    if (userExists) {
+      res.status(400);
+      throw new Error(
+        "User already exists with same email address or CNIC number"
+      );
+    }
 
     userData.contract_durations = [];
     userData.contract_durations.push({
@@ -283,9 +295,30 @@ const updateUser = asyncHandler(async (req, res) => {
     // check if user exist with param id
     const findUser = await findUserById(req.params.id);
 
-    if (!findUser) {
+    if (!findUser || findUser.length === 0) {
       res.status(400);
       throw new Error("User don't exist");
+    }
+
+    //check if user email and cnic already exist
+    if (
+      findUser[0].email !== userDetail.email ||
+      (userDetail.cnic && findUser[0].cnic !== userDetail.cnic) ||
+      (userDetail.phone_number &&
+        findUser[0].phone_number !== userDetail.phone_number)
+    ) {
+      const userExists = await getUserByUniqueValues(
+        userDetail,
+        findUser[0].id
+      );
+
+      // if yes then throw error
+      if (userExists) {
+        res.status(400);
+        throw new Error(
+          "User already exists with same email address, CNIC or phone number"
+        );
+      }
     }
 
     //now update that user
@@ -398,7 +431,7 @@ const resetUserPassword = asyncHandler(async (req, res) => {
     //check if user exist with param id
     const findUser = await findUserById(req.params.id);
 
-    if (!findUser) {
+    if (!findUser || findUser.length === 0) {
       res.status(400);
       throw new Error("User don't exist");
     }
@@ -458,7 +491,7 @@ const renewContract = asyncHandler(async (req, res) => {
     // check if user exist with param id
     const findUser = await findUserById(req.params.id);
 
-    if (!findUser) {
+    if (!findUser || findUser.length === 0) {
       res.status(400);
       throw new Error("User don't exist");
     }

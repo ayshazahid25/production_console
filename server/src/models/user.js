@@ -108,10 +108,6 @@ const schemaUser = new mongoose.Schema(
   }
 );
 
-// Compound index to enforce uniqueness only when the field is not null
-schemaUser.index({ phone_number: 1, _id: 1 }, { unique: true, sparse: true });
-schemaUser.index({ cnic: 1, _id: 1 }, { unique: true, sparse: true });
-
 //joi validation
 function validateCreateUser(user) {
   const schema = Joi.object({

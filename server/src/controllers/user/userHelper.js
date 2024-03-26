@@ -64,6 +64,32 @@ const findUser = async (email) => {
   }
 };
 
+const getUserByUniqueValues = async (user, userExistid) => {
+  let checkUnique = {
+    $or: [
+      { email: user.email },
+      user.cnic && { cnic: user.cnic }, // Only include CNIC if it exists
+      user.phone_number && { phone_number: user.phone_number }, // Only include Phone Number if it exists
+    ].filter(Boolean), // Filter out null/undefined values
+  };
+
+  let whereStatement;
+  if (userExistid) {
+    whereStatement = {
+      $and: [{ _id: { $ne: userExistid } }, checkUnique],
+    };
+  } else {
+    whereStatement = checkUnique;
+  }
+
+  try {
+    const result = await Users.findOne(whereStatement);
+    return result;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 //create user
 const addUserMiddleware = async (userDetails) => {
   try {
@@ -406,6 +432,7 @@ const countActiveEmployees = async () => {
 
 module.exports = {
   findUser,
+  getUserByUniqueValues,
   addUserMiddleware,
   getUserById,
   getAllusersMiddleware,

@@ -60,7 +60,7 @@ export const updateUserRequest = (userId, userData) => ({
       last_name: userData.last_name,
       email: userData.email,
       phone_number: userData.phone_number,
-      cnic: userData.CNIC,
+      cnic: userData.cnic,
       address: userData.address,
     },
   },

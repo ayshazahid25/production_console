@@ -173,11 +173,13 @@ function UserNewEditForm({
         userData.password = data.password;
         userData.employment_type = data.employment_type;
         userData.start_date = data.start_date.toISOString();
-        userData.end_date =
-          data.employment_type === 'permanent' ? null : data.end_date.toISOString();
+        if (data.employment_type !== 'permanent') {
+          userData.end_date = data.end_date.toISOString();
+        }
 
         handleSubmited(userData);
 
+        setIsDateDisabled(false);
         reset();
       } else {
         handleSubmited(userData);
@@ -409,49 +411,88 @@ function UserNewEditForm({
                   />
                 </Grid>
               </Grid>
-
-              <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={4}>
-                  {!isEdit && (
-                    <RHFTextField
-                      name="employment_type"
-                      label="Employment Type *"
-                      select
-                      variant="outlined"
-                      onChange={(e) => handleEmploymentTypeChange(e.target.value)}
-                    >
-                      {employetypeArray.map((option) => (
-                        <MenuItem key={option.value} value={option.value}>
-                          {option.label}
-                        </MenuItem>
-                      ))}
-                    </RHFTextField>
-                  )}
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <DesktopDatePicker
-                    label="Start Date *"
-                    value={getValues('start_date')}
-                    onChange={(date) => setValue('start_date', date, { shouldValidate: true })}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                    inputFormat="MM/dd/yyyy"
-                  />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                  <DesktopDatePicker
-                    label="End Date *"
-                    disabled={isDateDisabled} // Disable if employment type is permanent
-                    value={getValues('end_date')}
-                    minDate={getValues('start_date')}
-                    onChange={(date) => setValue('end_date', date, { shouldValidate: true })}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                    inputFormat="MM/dd/yyyy"
-                  />
-                </Grid>
-              </Grid>
-
+              {!isEdit && (
+                <>
+                  <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={4}>
+                      <RHFTextField
+                        name="employment_type"
+                        label="Employment Type *"
+                        select
+                        variant="outlined"
+                        onChange={(e) => handleEmploymentTypeChange(e.target.value)}
+                      >
+                        {employetypeArray.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
+                      </RHFTextField>
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="start_date"
+                        control={control}
+                        defaultValue={null}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error, invalid },
+                        }) => (
+                          <DesktopDatePicker
+                            label="Start Date *"
+                            value={value}
+                            onChange={(date) => onChange(date)}
+                            renderInput={(params) => (
+                              <TextField
+                                error={invalid}
+                                helperText={invalid ? error.message : null}
+                                id="start_date"
+                                margin="none"
+                                fullWidth
+                                color="primary"
+                                {...params}
+                              />
+                            )}
+                            inputFormat="yyyy-MM-dd"
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={4}>
+                      <Controller
+                        name="end_date"
+                        control={control}
+                        defaultValue={null}
+                        render={({
+                          field: { onChange, value },
+                          fieldState: { error, invalid },
+                        }) => (
+                          <DesktopDatePicker
+                            label="End Date *"
+                            value={value}
+                            disabled={isDateDisabled}
+                            minDate={getValues('start_date')}
+                            onChange={(date) => onChange(date)}
+                            renderInput={(params) => (
+                              <TextField
+                                error={invalid}
+                                helperText={invalid ? error.message : null}
+                                id="end_date"
+                                margin="none"
+                                fullWidth
+                                color="primary"
+                                {...params}
+                              />
+                            )}
+                            inputFormat="yyyy-MM-dd"
+                          />
+                        )}
+                      />
+                    </Grid>
+                  </Grid>
+                </>
+              )}
               <Divider variant="middle" sx={{ mt: 2, mb: 2 }} />
 
               <Stack alignItems="flex-end" sx={{ mt: 3 }}>
