@@ -73,6 +73,32 @@ export const updateUserSuccess = ({ message }) => ({
   },
 });
 
+// ********** UPDATINGPERMISSIONREQUEST **********
+export const updatePermissionRequest = (userId, userData) => ({
+  type: types.UPDATE_PERMISSION_REQUEST,
+  payload: {
+    userId,
+    user: {
+      title: userData.title,
+      gender: userData.gender,
+      first_name: userData.first_name,
+      last_name: userData.last_name,
+      email: userData.email,
+      billing_rate: userData.billing_rate,
+      phone_number: userData.phone_number,
+      cnic: userData.CNIC,
+      address: userData.address,
+    },
+  },
+});
+
+export const updatePermissionSuccess = ({ message }) => ({
+  type: types.UPDATE_PERMISSION_SUCCESS,
+  payload: {
+    message,
+  },
+});
+
 // ********** BULK FREEZE **********
 export const deleteUserRequest = ({ userId, is_active, isEdit = false }) => ({
   type: types.DELETE_USER_REQUEST,
