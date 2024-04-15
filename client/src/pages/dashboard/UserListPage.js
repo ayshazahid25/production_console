@@ -328,8 +328,8 @@ function UserListPage({
                         row={row}
                         selected={selected.includes(row._id)}
                         onSelectRow={() => onSelectRow(row._id)}
-                        onDeleteRow={() => handleDeleteRow(row.id, { status: false })}
-                        onActiveRow={() => handleDeleteRow(row.id, { status: true })}
+                        onDeleteRow={() => handleDeleteRow(row._id, { status: false })}
+                        onActiveRow={() => handleDeleteRow(row._id, { status: true })}
                         onEditRow={() => handleEditRow(row._id)}
                       />
                     ))}

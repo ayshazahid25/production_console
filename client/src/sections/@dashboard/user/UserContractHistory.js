@@ -1,6 +1,5 @@
 import { Helmet } from 'react-helmet-async';
-import { paramCase } from 'change-case';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
@@ -10,24 +9,18 @@ import {
   Tabs,
   Card,
   Table,
-  Button,
-  Tooltip,
   Divider,
   TableBody,
   Container,
-  IconButton,
   TableContainer,
   Grid,
 } from '@mui/material';
-// routes
-import { PATH_DASHBOARD } from '../../../routes/paths';
+
 // _mock_
 import { _userList } from '../../../_mock/arrays';
 // components
-import Iconify from '../../../components/iconify';
+
 import Scrollbar from '../../../components/scrollbar';
-import ConfirmDialog from '../../../components/confirm-dialog';
-import CustomBreadcrumbs from '../../../components/custom-breadcrumbs';
 import { useSettingsContext } from '../../../components/settings';
 import {
   useTable,
@@ -36,7 +29,6 @@ import {
   TableNoData,
   TableEmptyRows,
   TableHeadCustom,
-  TableSelectedAction,
   TablePaginationCustom,
 } from '../../../components/table';
 import ContractTableRow from './list/ContractTableRow';
@@ -48,19 +40,6 @@ import RenewContract from './RenewContract';
 // const STATUS_OPTIONS = ['all', 'active', 'banned'];
 const STATUS_OPTIONS = ['all', 'permanent', 'probation', 'internship', 'contract'];
 
-const ROLE_OPTIONS = [
-  'all',
-  'ux designer',
-  'full stack designer',
-  'backend developer',
-  'project manager',
-  'leader',
-  'ui designer',
-  'ui/ux designer',
-  'front end developer',
-  'full stack developer',
-];
-
 const TABLE_HEAD = [
   { id: 'employment_type', label: 'Employment Type', align: 'left' },
   { id: 'start_date', label: 'Start Date', align: 'center' },
@@ -71,8 +50,6 @@ const TABLE_HEAD = [
 // ----------------------------------------------------------------------
 
 function UserContractHistory({ Users: { user } }) {
-  const userContractList = user.contract_durations;
-
   const {
     dense,
     page,
@@ -89,13 +66,19 @@ function UserContractHistory({ Users: { user } }) {
 
   const { themeStretch } = useSettingsContext();
 
-  const navigate = useNavigate();
-
-  const [tableData, setTableData] = useState(userContractList);
+  const [tableData, setTableData] = useState([]);
 
   const [filterName, setFilterName] = useState('');
 
   const [filterStatus, setFilterStatus] = useState('all');
+
+  useEffect(() => {
+    if (user) {
+      setTableData(user.contract_durations);
+    }
+
+    // eslint-disable-next-line
+  }, [user]);
 
   const dataFiltered = applyFilter({
     inputData: tableData,
@@ -120,6 +103,8 @@ function UserContractHistory({ Users: { user } }) {
     setPage(0);
     setFilterName(event.target.value);
   };
+
+  const today = new Date();
   return (
     <>
       <Grid container spacing={3}>
@@ -129,7 +114,9 @@ function UserContractHistory({ Users: { user } }) {
           md={12}
           sx={{ display: 'flex', alignItems: 'end', justifyContent: 'end' }}
         >
-          <RenewContract />
+          {tableData.length > 0 && tableData[tableData.length - 1].end_date <= today && (
+            <RenewContract lastContract={tableData[tableData.length - 1]} />
+          )}
         </Grid>
         <Grid item xs={12} md={12}>
           <Helmet>
@@ -168,7 +155,7 @@ function UserContractHistory({ Users: { user } }) {
                       {dataFiltered
                         .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                         .map((row) => (
-                          <ContractTableRow key={row.id} row={row} />
+                          <ContractTableRow key={row._id} row={row} />
                         ))}
 
                       <TableEmptyRows

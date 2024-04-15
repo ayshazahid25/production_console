@@ -113,22 +113,7 @@ function UserAccountPage({
       value: 'permissionSettings',
       label: 'Contract History',
       icon: <Iconify icon="ic:round-receipt" />,
-      component: (
-        <UserContractHistory
-          // isEdit
-          // handleSubmited={submitPermission}
-          // currentPermission={permissionSettings || user?.permission_settings || null}
-          currentUser={user}
-        />
-      ),
-      // component: (
-      //   <UserPermissionSettings
-      //     isEdit
-      //     handleSubmited={submitPermission}
-      //     currentPermission={permissionSettings || user?.permission_settings || null}
-      //     currentUser={userData || user}
-      //   />
-      // ),
+      component: <UserContractHistory />,
     },
   ];
 
